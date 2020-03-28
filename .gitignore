@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+.vs
+*.pdb
+*.idb
+obj
+/projects/xiyue/xiyue/lib
+/projects/tannpopo/tannpopo/lib
+*.ilk
+/projects/xiyue/xiyue_test/bin
+/projects/tannpopo/tannpopo_viewer/TannpopoViewer/Debug

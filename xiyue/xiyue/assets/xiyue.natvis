@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="xiyue::ConstString">
+    <DisplayString Condition="m_unmanagedStringData != 0">{m_unmanagedStringData + m_start,[m_length]su}_cs</DisplayString>
+    <DisplayString Condition="m_data != 0">{(wchar_t*)(m_data + 1) + m_start,[m_length]su}</DisplayString>
+    <DisplayString>L""</DisplayString>
+    <StringView Condition="m_unmanagedStringData != 0">m_unmanagedStringData + m_start,[m_length]su</StringView>
+    <StringView Condition="m_data != 0">(wchar_t*)(m_data + 1) + m_start,[m_length]su</StringView>
+  </Type>
+  
+  <Type Name="xiyue::JsonAction">
+    <DisplayString Condition="action == 0">G{data}</DisplayString>
+    <DisplayString Condition="action == 1">S{data}</DisplayString>
+    <DisplayString Condition="action == 2">R{data}</DisplayString>
+    <DisplayString Condition="action == 3">E{data}</DisplayString>
+  </Type>
+  
+  <Type Name="xiyue::JsonStringData">
+    <DisplayString>{stringValue,[strLen]su}</DisplayString>
+    <StringView>stringValue,[strLen]su</StringView>
+  </Type>
+  
+  <Type Name="xiyue::JsonListData">
+    <DisplayString>Json List ({valueSize}/{reservedSize})</DisplayString>
+    <Expand>
+      <Item Name="[size]">valueSize</Item>
+      <Item Name="[capacity]">reservedSize</Item>
+      <ArrayItems Condition="valueSize != 0">
+        <Size>valueSize</Size>
+        <ValuePointer>values</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="xiyue::JsonMember">
+    <DisplayString>{key} : {*value}</DisplayString>
+    <Expand>
+      <Item Name="[key]">key</Item>
+      <Item Name="[Value]">*value</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="xiyue::JsonMemberData">
+    <DisplayString>Json Object ({valueSize}/{reservedSize})</DisplayString>
+    <Expand>
+      <Item Name="[size]">valueSize</Item>
+      <Item Name="[capacity]">reservedSize</Item>
+      <ArrayItems>
+        <Size>valueSize</Size>
+        <ValuePointer>members</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="xiyue::JsonData">
+    <DisplayString Condition="jsonType == xiyue::Json_null">null</DisplayString>
+    <DisplayString Condition="jsonType == xiyue::Json_string">{stringValue}</DisplayString>
+    <DisplayString Condition="jsonType == xiyue::Json_int">{intValue}</DisplayString>
+    <DisplayString Condition="jsonType == xiyue::Json_real">{realValue}</DisplayString>
+    <DisplayString Condition="jsonType == xiyue::Json_boolean">{boolValue}</DisplayString>
+    <DisplayString Condition="jsonType == xiyue::Json_list">{listValue}</DisplayString>
+    <DisplayString Condition="jsonType == xiyue::Json_object">{memberValue}</DisplayString>
+  </Type>
+
+  <Type Name="xiyue::JsonObject">
+    <DisplayString>{*m_data}</DisplayString>
+    <Expand>
+      <Item Condition="m_data->jsonType == xiyue::Json_object" Name="[items]">m_data->memberValue</Item>
+      <Item Condition="m_data->jsonType == xiyue::Json_list" Name="[items]">m_data->listValue</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

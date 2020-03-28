@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="File Manager">
+      <UniqueIdentifier>{1754eaab-c697-4434-8273-31962e1f5599}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Types">
+      <UniqueIdentifier>{494626c5-8289-46ba-9a66-9c5ad58f0aee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Log System">
+      <UniqueIdentifier>{6ade09a2-f523-4180-9f55-bce507af81bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{01bcc874-8a3e-4858-83c7-3d984d3664b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json">
+      <UniqueIdentifier>{f48e9747-3231-4901-a6b5-a5f3dd85e587}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json\Json Object">
+      <UniqueIdentifier>{e417f91a-cc37-45d9-961c-dc20c0459461}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json\Json Allocator">
+      <UniqueIdentifier>{f58ace54-cc47-4f67-9356-e6765cc25dfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json\Json Parser">
+      <UniqueIdentifier>{76477e1f-d887-4ccc-9209-d8240a1dc0c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Json\Json Exception">
+      <UniqueIdentifier>{26a336eb-f206-4937-8b29-6621d937ab2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="String">
+      <UniqueIdentifier>{a919ad2c-346b-426a-9537-4c66a87d5a07}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src/stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src/targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_file.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_string_file_reader.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_string_file_writer.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_file_types.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_basic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_encoding.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_logger.h">
+      <Filter>Log System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_logger_manager.h">
+      <Filter>Log System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_console_log_consumer.h">
+      <Filter>Log System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_int64_pair.h">
+      <Filter>Types</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_const_string.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_string_format.h">
+      <Filter>String</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_buffered_file_reader.h">
+      <Filter>File Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_object.h">
+      <Filter>Json\Json Object</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_document.h">
+      <Filter>Json\Json Object</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_data_allocator.h">
+      <Filter>Json\Json Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_data.h">
+      <Filter>Json\Json Object</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_default_json_data_allocator.h">
+      <Filter>Json\Json Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_lexer.h">
+      <Filter>Json\Json Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_parser.h">
+      <Filter>Json\Json Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_exception.h">
+      <Filter>Json\Json Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_errors.h">
+      <Filter>Json\Json Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_json_dumper.h">
+      <Filter>Json\Json Object</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src/stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_file.cpp">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_string_file_reader.cpp">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_encoding.cpp">
+      <Filter>Types</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_logger.cpp">
+      <Filter>Log System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_logger_manager.cpp">
+      <Filter>Log System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_console_log_consumer.cpp">
+      <Filter>Log System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_basic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_const_string.cpp">
+      <Filter>String</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_string_format.cpp">
+      <Filter>String</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_buffered_file_reader.cpp">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_string_file_writer.cpp">
+      <Filter>File Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_object.cpp">
+      <Filter>Json\Json Object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_default_json_data_allocator.cpp">
+      <Filter>Json\Json Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_parser.cpp">
+      <Filter>Json\Json Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_lexer.cpp">
+      <Filter>Json\Json Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_errors.cpp">
+      <Filter>Json\Json Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_document.cpp">
+      <Filter>Json\Json Object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_dumper.cpp">
+      <Filter>Json\Json Object</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_data_allocator.cpp">
+      <Filter>Json\Json Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_json_exception.cpp">
+      <Filter>Json\Json Exception</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="assets\xiyue.natvis">
+      <Filter>Tools</Filter>
+    </Natvis>
+  </ItemGroup>
+</Project>
