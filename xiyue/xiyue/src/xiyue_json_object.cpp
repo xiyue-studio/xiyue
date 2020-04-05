@@ -4,15 +4,23 @@
 #include "xiyue_default_json_data_allocator.h"
 #include "xiyue_logger_manager.h"
 
+#pragma warning(disable: 4073)
+#pragma init_seg(lib)
+
 using namespace std;
 using namespace xiyue;
 
-static thread_local DefaultJsonDataAllocator g_defaultAllocator;
-thread_local JsonDataAllocator* JsonObject::m_allocator = &g_defaultAllocator;
+static DefaultJsonDataAllocator g_defaultAllocator;
+JsonDataAllocator* JsonObject::m_allocator = &g_defaultAllocator;
 
 JsonObject::JsonObject(json_int_t val)
 {
 	m_data = m_allocator->allocIntData(val);
+}
+
+JsonObject::JsonObject(uint32_t val)
+{
+	m_data = m_allocator->allocIntData((json_int_t)val);
 }
 
 JsonObject::JsonObject(bool val)
@@ -230,7 +238,8 @@ uint32_t JsonObject::findMember(ConstString key)
 
 	auto& memberValue = m_data->memberValue;
 	auto it = find_if(memberValue.members, memberValue.members + memberValue.valueSize, [key](JsonMember& m) {
-		return wcsncmp(m.key.stringValue, key.data(), m.key.strLen) == 0;
+		return m.key.strLen == (json_int_t)key.length() &&
+			wcsncmp(m.key.stringValue, key.data(), m.key.strLen) == 0;
 	});
 
 	if (it == memberValue.members + memberValue.valueSize)
@@ -244,7 +253,8 @@ uint32_t JsonObject::findMember(const wchar_t* key)
 
 	auto& memberValue = m_data->memberValue;
 	auto it = find_if(memberValue.members, memberValue.members + memberValue.valueSize, [key](JsonMember& m) {
-		return wcsncmp(m.key.stringValue, key, m.key.strLen) == 0;
+		return m.key.strLen == (json_int_t)wcslen(key) &&
+			wcsncmp(m.key.stringValue, key, m.key.strLen) == 0;
 	});
 
 	if (it == memberValue.members + memberValue.valueSize)
@@ -333,7 +343,7 @@ void JsonObject::appendMember(ConstString key, const JsonObject& val)
 	assert(isObject());
 	auto& memberValue = m_data->memberValue;
 	if (memberValue.valueSize == memberValue.reservedSize)
-		m_allocator->reallocObjectMembers(m_data, memberValue.reservedSize * 2);
+		m_allocator->reallocObjectMembers(m_data, std::max(1u, memberValue.reservedSize * 2));
 	appendMemberNoCheck(key, val);
 }
 
@@ -467,4 +477,132 @@ bool JsonObject::operator==(bool val) const
 		return false;
 
 	return m_data->boolValue == val;
+}
+
+static inline bool canTransformToInt(JsonObjectType type)
+{
+	switch (type)
+	{
+	case Json_null:
+	case Json_boolean:
+	case Json_int:
+		return true;
+	default:
+		return false;
+	}
+}
+
+JsonObject JsonObject::operator+(const JsonObject& r) const
+{
+	if (isString() || r.isString())
+	{
+		// 字符串相加，返回合并的字符串
+		return JsonObject(toString() + r.toString());
+	}
+
+	if (canTransformToInt(getType()) && canTransformToInt(r.getType()))
+	{
+		// 能够转换成 int 就按照 int 类型计算
+		return JsonObject(intValue() + r.intValue());
+	}
+
+	// 否则，转换成 double 进行计算
+	return JsonObject(toReal() + r.toReal());
+}
+
+JsonObject JsonObject::operator-(const JsonObject& r) const
+{
+	if (canTransformToInt(getType()) && canTransformToInt(r.getType()))
+	{
+		// 能够转换成 int 就按照 int 类型计算
+		return JsonObject(intValue() - r.intValue());
+	}
+
+	// 否则，转换成 double 进行计算
+	return JsonObject(toReal() - r.toReal());
+}
+
+static inline bool canMultiply(const JsonObject& s, const JsonObject& i)
+{
+	if (!s.isString())
+		return false;
+	if (!i.isInt())
+		return false;
+
+	if (i.intValue() < 0)
+		return false;
+
+	return true;
+}
+
+JsonObject JsonObject::operator*(const JsonObject& r) const
+{
+	if (canMultiply(*this, r))
+		return JsonObject(ConstString::makeByRepeat(stringValue(), r.toInteger()));
+	
+	if (canMultiply(r, *this))
+		return JsonObject(ConstString::makeByRepeat(r.stringValue(), toInteger()));
+
+	if (isInt() && r.isInt())
+		return JsonObject(intValue() * r.intValue());
+
+	return JsonObject(toReal() * r.toReal());
+}
+
+JsonObject JsonObject::operator/(const JsonObject& r) const
+{
+	if (isInt() && r.isInt())
+	{
+		if (r.intValue() == 0)
+			return JsonObject(nan(""));
+
+		return JsonObject(intValue() / r.intValue());
+	}
+
+	return JsonObject(toReal() / r.toReal());
+}
+
+ConstString JsonObject::toString() const
+{
+	return operator ConstString();
+}
+
+json_int_t JsonObject::toInteger() const
+{
+	switch (getType())
+	{
+	case Json_null:
+		return 0;
+	case Json_int:
+		return intValue();
+	case Json_real:
+		return (json_int_t)realValue();
+	case Json_boolean:
+		return booleanValue() ? 1 : 0;
+	case Json_string:
+		if (stringValue().canTransformToInt())
+			return stringValue().toInt();
+	default:
+		throw exception("JsonObject can not transform to int.");
+	}
+}
+
+double JsonObject::toReal() const
+{
+	switch (getType())
+	{
+	case Json_null:
+		return 0;
+	case Json_int:
+		return (double)intValue();
+	case Json_real:
+		return realValue();
+	case Json_boolean:
+		return booleanValue() ? 1.0 : 0.0;
+	case Json_string:
+		if (stringValue().canTransformToDouble())
+			return stringValue().toDouble();
+	default:
+		return nan("");
+	}
 }

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <regex>
 #include "xiyue_const_string.h"
 #include "xiyue_encoding.h"
 
@@ -6,6 +7,7 @@ using namespace std;
 using namespace xiyue;
 
 static ConstString g_defaultDelimiter = L" \t\r\n\v\f"_cs;
+static const wchar_t* g_emptyString = L"";
 
 ConstStringPointer::ConstStringPointer(ConstString str)
 	: m_string(str)
@@ -125,7 +127,7 @@ ConstString::ConstString()
 	: m_start(0)
 	, m_length(0)
 	, m_data(nullptr)
-	, m_unmanagedStringData(nullptr)
+	, m_unmanagedStringData(g_emptyString)
 {
 }
 
@@ -228,7 +230,7 @@ bool ConstString::operator<(const wchar_t* str) const
 	return wcsncmp(data(), str, m_length) < 0;
 }
 
-ConstString ConstString::substr(int start, int size /*= 1*/) const
+ConstString ConstString::substr(int start, int size) const
 {
 	assert(start + size <= m_length);
 
@@ -237,6 +239,11 @@ ConstString ConstString::substr(int start, int size /*= 1*/) const
 	result.m_length = size;
 
 	return result;
+}
+
+ConstString ConstString::substr(int start) const
+{
+	return substr(start, length() - start);
 }
 
 ConstString ConstString::right(int size) const
@@ -287,14 +294,29 @@ ConstString ConstString::trim(const ConstString& trimChars /*= L""cs*/) const
 	return lTrim(trimChars).rTrim(trimChars);
 }
 
-size_t ConstString::find(const ConstString& /*str*/, int /*start*/ /*= 0*/) const
+int ConstString::find(const ConstString& /*str*/, int /*start*/ /*= 0*/) const
 {
 	throw exception("Should be implement by KMP algorithm.");
 }
 
-size_t ConstString::reverseFind(const ConstString& /*str*/, int /*start*/ /*= -1*/) const
+int ConstString::reverseFind(const ConstString& /*str*/, int /*start*/ /*= -1*/) const
 {
 	throw exception("Should be implement by KMP algorithm.");
+}
+
+int ConstString::reverseFind(wchar_t ch, int start /*= -1*/) const
+{
+	int index = normalizeIndex(start);
+	const wchar_t* p = data() + index;
+	const wchar_t* pEnd = data() - 1;
+	while (p != pEnd)
+	{
+		if (*p == ch)
+			return static_cast<int>(p - data());
+		--p;
+	}
+
+	return -1;
 }
 
 bool ConstString::containsChar(wchar_t ch) const
@@ -538,8 +560,8 @@ ConstString ConstString::operator+(ConstString r) const
 	s.m_data = (ConstStringData*)malloc(sizeof(wchar_t) * (s.m_length + 1) + sizeof(ConstStringData));
 	s.m_data->nRefCount = 1;
 	s.m_data->nBufferSize = s.m_length + 1;
-	memcpy(s.m_data->stringData(), m_data->stringData(), sizeof(wchar_t) * length());
-	memcpy(s.m_data->stringData() + length(), r.m_data->stringData(), sizeof(wchar_t) * r.length());
+	memcpy(s.m_data->stringData(), data(), sizeof(wchar_t) * length());
+	memcpy(s.m_data->stringData() + length(), r.data(), sizeof(wchar_t) * r.length());
 	s.m_data->stringData()[s.m_length] = 0;
 
 	return s;
@@ -566,5 +588,38 @@ ConstString ConstString::makeByReservedSize(size_t size)
 	result.m_data = (ConstStringData*)malloc(sizeof(wchar_t) * (size + 1) + sizeof(ConstStringData));
 	result.m_data->nBufferSize = size + 1;
 	result.m_data->nRefCount = 1;
+	result.m_unmanagedStringData = nullptr;
 	return result;
+}
+
+ConstString ConstString::makeByRepeat(const ConstString& s, int repeatNum)
+{
+	ConstString sr = makeByReservedSize(s.length() * repeatNum);
+	wchar_t* p = sr._getStringData()->stringData();
+	for (int i = 0; i < repeatNum; ++i)
+	{
+		wcscpy_s(p, s.length() + 1, s.data());
+		p += s.length();
+	}
+
+	return sr;
+}
+
+ConstString ConstString::makeByRepeat(const wchar_t* s, int repeatNum)
+{
+	return makeByRepeat(makeUnmanagedString(s, (int)wcslen(s)), repeatNum);
+}
+
+bool ConstString::canTransformToInt() const
+{
+	static wregex intRegex(L"\\d+");
+
+	return regex_match(begin(), end(), intRegex);
+}
+
+bool ConstString::canTransformToDouble() const
+{
+	static wregex doubleRegex(LR"([-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?)", wregex::icase);
+
+	return regex_match(begin(), end(), doubleRegex);
 }

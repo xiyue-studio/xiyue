@@ -39,5 +39,15 @@ namespace xiyue
 	};
 
 	size_t xiyue_unescapeCppStyleInplace(wchar_t* str, size_t len);
-	size_t xiyue_escapeCppStyleCharsAppend(const wchar_t* str, size_t len, std::wstring& bufferToAppend);
+	std::wstring xiyue_escapeCppStyleChars(const wchar_t* str, size_t len);
+	inline std::wstring xiyue_escapeCppStyleChars(const ConstString& str) {
+		return xiyue_escapeCppStyleChars(str.data(), str.length());
+	}
+
+	/*
+		将类似于 name_of_variable 的命名方式转化成 nameOfVariable 的形式。
+		多个单词之前如果有多个分隔，例如 `name      of----case`，都会被合并。
+		起始位置的非字母字符会被忽略。
+	*/
+	ConstString xiyue_makeCamelCaseName(const ConstString& src, bool uppercaseFirstLetter);
 }

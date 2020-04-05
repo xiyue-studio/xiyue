@@ -203,6 +203,127 @@ size_t xiyue::xiyue_unescapeCppStyleInplace(wchar_t* str, size_t len)
 	return resultLen;
 }
 
+wstring xiyue::xiyue_escapeCppStyleChars(const wchar_t* str, size_t len)
+{
+	const wchar_t* p = str;
+	const wchar_t* pEnd = str + len;
+	wstring result;
+
+	while (p < pEnd)
+	{
+		wchar_t ch = *p++;
+		switch (ch)
+		{
+		case '\t':
+			result.append(L"\\t");
+			break;
+		case '\r':
+			result.append(L"\\r");
+			break;
+		case '\n':
+			result.append(L"\\n");
+			break;
+		case '"':
+			result.append(L"\\\"");
+			break;
+		case '\\':
+			result.append(L"\\\\");
+			break;
+		case '\'':
+			result.append(L"\\'");
+			break;
+		case '\a':
+			result.append(L"\\a");
+			break;
+		case '\b':
+			result.append(L"\\b");
+			break;
+		case '\f':
+			result.append(L"\\f");
+			break;
+		case '\0':
+			result.append(L"\\0");
+			break;
+		default:
+			if (!isAscii(ch))
+			{
+				wchar_t buffer[16];
+				result.append(L"\\u").append(itow(buffer, ch, 16));
+			}
+			else
+			{
+				result.push_back(ch);
+			}
+			break;
+		}
+	}
+
+	return result;
+}
+
+/*
+	状态集：
+	0: 跳过开头非字母符号，遇到字符跳到状态1，否则跳到状态3
+	1: 读入一个单词，即字母数字的集合体，遇到非单词字符跳到状态2，否则跳到状态3
+	2: 跳过连续n个非单词字符，遇到单词字符之后，尝试转换大写，然后跳到状态1，否则跳到状态3
+	3: 结束
+*/
+ConstString xiyue::xiyue_makeCamelCaseName(const ConstString& src, bool uppercaseFirstLetter)
+{
+	ConstString result = ConstString::makeByReservedSize(src.length());
+	wchar_t* pDst = result._getStringData()->stringData();
+	const wchar_t* pSrc = src.data();
+
+	int state = 0;
+	for (;;)
+	{
+		wchar_t ch = *pSrc;
+		switch (state)
+		{
+		case 0:
+			if (ch == 0)
+			{
+				state = 3;
+			}
+			else if (isAlpha(ch))
+			{
+				*pDst++ = static_cast<wchar_t>(uppercaseFirstLetter ? toupper(ch) : tolower(ch));
+				state = 1;
+			}
+			break;
+		case 1:
+			if (isAlphaDigit(ch))
+				*pDst++ = static_cast<wchar_t>(tolower(ch));
+			else if (ch == 0)
+				state = 3;
+			else
+				state = 2;
+			break;
+		case 2:
+			if (ch == 0)
+			{
+				state = 3;
+			}
+			else if (isAlphaDigit(ch))
+			{
+				*pDst++ = static_cast<wchar_t>(toupper(ch));
+				state = 1;
+			}
+			break;
+		}
+
+		if (state == 3)
+			break;
+
+		pSrc++;
+	}
+
+	*pDst = 0;
+	result._resetLength(pDst - result._getStringData()->stringData());
+	assert(result._getStringData()->nBufferSize >= result.length());
+	return result;
+}
+
 bool ParseUtils::matchString(ConstStringPointer& p, bool* hasEscapeChar, bool* hasUnmatchedQuote)
 {
 	bool _hasEscapedChar = false;

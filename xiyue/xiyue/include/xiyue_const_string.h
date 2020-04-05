@@ -51,6 +51,8 @@ namespace xiyue
 		static ConstString makeByFormat(const wchar_t* format, ...);
 		static ConstString fromInteger(int val);
 		static ConstString fromDouble(double val, const wchar_t* format = nullptr);
+		static ConstString makeByRepeat(const ConstString& s, int repeatNum);
+		static ConstString makeByRepeat(const wchar_t* s, int repeatNum);
 
 
 	public:
@@ -75,23 +77,34 @@ namespace xiyue
 		ConstStringPointer getPointer() const;
 		bool isUnmanagedString() const { return m_unmanagedStringData != nullptr; }
 		const wchar_t* cstr() const { return (const wchar_t*)*this; }
+		bool equalsIgnoreCase(const ConstString& r) const;
+		bool equalsIgnoreCase(const wchar_t* r) const;
 
 	public:
 		ConstString duplicate() const;
-		ConstString substr(int start, int size = 1) const;
+		ConstString substr(int start, int size) const;
+		ConstString substr(int start) const;
 		ConstString left(int size) const;
 		ConstString right(int size) const;
 		ConstString lTrim(const ConstString& trimChars = L""_cs) const;
 		ConstString rTrim(const ConstString& trimChars = L""_cs) const;
 		ConstString trim(const ConstString& trimChars = L""_cs) const;
-		size_t find(const ConstString& str, int start = 0) const;
-		size_t reverseFind(const ConstString& str, int start = -1) const;
+		int find(const ConstString& str, int start = 0) const;
+		int find(wchar_t ch, int start = 0) const;
+		int reverseFind(const ConstString& str, int start = -1) const;
+		int reverseFind(wchar_t ch, int start = -1) const;
 		bool containsChar(wchar_t ch) const;
+		bool canTransformToInt() const;
+		bool canTransformToDouble() const;
 		ConstString replaceEscapedChars() const;
 		int toInt(int radius = 10) const;
 		double toDouble() const;
 		const wchar_t* begin() const;
 		const wchar_t* end() const;
+		void splitLines(std::vector<ConstString>& linesOut) const;
+
+	public:
+		static const int npos = -1;
 
 	public:
 		// 谨慎使用以下函数！
