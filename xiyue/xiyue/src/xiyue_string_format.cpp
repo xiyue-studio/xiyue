@@ -481,19 +481,10 @@ static int transformNumberDfaInput(wchar_t ch)
 	case '+':
 	case '-':
 		return 0;
-	case 'e':
-	case 'E':
+	case 'e': case 'E':
 		return 2;
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-	case '4':
-	case '5':
-	case '6':
-	case '7':
-	case '8':
-	case '9':
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
 		return 1;
 	default:
 		return -1;
@@ -521,10 +512,10 @@ bool ParseUtils::matchNumber(ConstStringPointer& p2, bool* isInteger)
 		if (state == 0)
 			break;
 
+		++p;
 		if (state == 2 || state == 4 || state == 5 || state == 8)
 			lastSuccPos = p.getOffset();
 
-		++p;
 		ch = *p;
 	}
 
@@ -534,7 +525,7 @@ bool ParseUtils::matchNumber(ConstStringPointer& p2, bool* isInteger)
 	if (isInteger)
 		*isInteger = _isInteger;
 
-	p2.reset(lastSuccPos + 1);
+	p2.reset(lastSuccPos);
 	return true;
 }
 

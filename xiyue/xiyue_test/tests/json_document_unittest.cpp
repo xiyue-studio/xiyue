@@ -37,3 +37,20 @@ TEST(JsonDocumentTest, nestingObjectTest)
 	EXPECT_EQ(root[L"hobby"][2][L"language"], L"C++");
 	EXPECT_EQ(root[L"hobby"][2][L"exp"], 10);
 }
+
+TEST(JsonDocumentTest, timeTest)
+{
+	StringFileReader reader;
+	ASSERT_TRUE(reader.readFile(L"beijing2shanghai.json"));
+
+	int sampleCount = 100;
+	auto tick = GetTickCount();
+	for (int i = 0; i < sampleCount; ++i)
+	{
+		JsonDocument doc;
+		doc.setRetainMode(true);
+		doc.parse(reader.getText());
+	}
+	tick = GetTickCount() - tick;
+	printf("Time cost: %u, %f per second.\n", tick, (sampleCount * 1000.0) / tick);
+}

@@ -41,10 +41,10 @@ namespace xiyue
 
 	inline constexpr bool isLineBreak(int c) { return c == '\r' || c == '\n'; }
 
-	inline constexpr bool isSpace(int c) { return c < 255 && isspace(c); }
+	inline constexpr bool isSpace(int c) { return c == ' ' || c == '\t' || c == '\n' || c == '\r'; }
 
-	inline constexpr bool isAlpha(int c) { return c < 255 && isalpha(c); }
-	inline constexpr bool isDigit(int c) { return c < 255 && isdigit(c); }
+	inline constexpr bool isAlpha(int c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
+	inline constexpr bool isDigit(int c) { return c >= '0' && c <= '9'; }
 	inline constexpr bool isAlphaDigit(int c) { return isAlpha(c) || isDigit(c); }
 	inline constexpr bool isWordChar(int c) { return isAlphaDigit(c) || c == '_'; }
 	inline constexpr bool isHexDigit(int c) {

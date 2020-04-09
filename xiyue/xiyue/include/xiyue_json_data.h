@@ -13,7 +13,8 @@ namespace xiyue
 		Json_real,
 		Json_boolean,
 		Json_list,
-		Json_object
+		Json_object,
+		Json_undefined,
 	};
 
 	enum JsonStringType

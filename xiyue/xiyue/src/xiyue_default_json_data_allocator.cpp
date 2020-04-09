@@ -131,7 +131,7 @@ void DefaultJsonDataAllocator::reallocObjectMembers(JsonData* objectData, size_t
 	assert(newSize > objectData->memberValue.valueSize);
 
 	auto& valueAddr = objectData->memberValue.members;
-	valueAddr = (JsonMember*)realloc(valueAddr, getMallocSize<JsonMember*>(newSize));
+	valueAddr = (JsonMember*)realloc(valueAddr, getMallocSize<JsonMember>(newSize));
 	objectData->memberValue.reservedSize = newSize;
 }
 

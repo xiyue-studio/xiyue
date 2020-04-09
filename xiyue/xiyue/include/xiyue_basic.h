@@ -95,6 +95,8 @@ namespace xiyue
 
 	int64_t wtoi(const wchar_t* buffer);
 
+	int64_t wcstoi(const wchar_t* start, const wchar_t* end, int radius);
+
 	wchar_t* ftow(wchar_t* buffer, size_t length, double number);
 
 	template<size_t size>

@@ -32,7 +32,7 @@ namespace xiyue
 			如果没有打开保持模式，则解析会变慢，但是解析出来的 JsonObject 可以脱离
 			Document 使用。
 		*/
-		bool setRetainMode(bool retainModeOn) { m_isRetainMode = retainModeOn; }
+		void setRetainMode(bool retainModeOn) { m_isRetainMode = retainModeOn; }
 		bool setRedundantCommaIgnored(bool ignored) { m_ignoreRedundantComma = ignored; }
 		bool setTopBraceIgnored(bool ignored) { m_ignoreTopBrace = ignored; }
 

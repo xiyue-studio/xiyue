@@ -152,12 +152,13 @@ namespace xiyue
 		ConstStringPointer& operator=(const ConstStringPointer& r);
 
 	public:
-		int getOffset() const { return m_offset; }
-		void reset(int offset) { m_offset = offset; }
+		int getOffset() const { return m_cursor - m_stringBase; }
+		void reset(int offset) { m_cursor = m_stringBase + offset; }
 
 	private:
 		ConstString m_string;
-		int m_offset;
+		const wchar_t* m_cursor;
+		const wchar_t* m_stringBase;
 	};
 
 	inline ConstString operator"" _cs(const wchar_t* str, size_t size) {

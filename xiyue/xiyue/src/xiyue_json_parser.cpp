@@ -141,7 +141,7 @@ template<typename T>
 static inline void popVectorBackN(vector<T>& v, int n) {
 	if (n == 0)
 		return;
-	v.erase(v.end() - n, v.end());
+	v.resize(v.size() - n);
 }
 
 JsonParser::JsonParser()
@@ -259,6 +259,36 @@ void JsonParser::reduceKeyValue()
 	m_rootObjects.back().setMember(key, obj);
 }
 
+static json_int_t csToJsonInt(const ConstString& str)
+{
+	json_int_t result = 0;
+	bool isNegtive;
+	const wchar_t* p = str.begin();
+	const wchar_t* pEnd = p + str.length();
+
+	// 决定符号
+	switch (*p)
+	{
+	case '-':
+		isNegtive = true;
+		++p;
+		break;
+	case '+':
+		++p;
+	default:
+		isNegtive = false;
+	}
+
+	// 解析数字
+	while (p < pEnd)
+	{
+		result += result * 10 + (*p - '0');
+		++p;
+	}
+
+	return isNegtive ? -result : result;
+}
+
 /*
 	12. object          = INT
 */
@@ -266,7 +296,7 @@ void JsonParser::reduceIntObject()
 {
 	const JsonToken& token = m_tokenStack.back();
 	ConstString intStr = m_jsonText.substr(token.offset, token.length);
-	JsonObject intObj = (json_int_t)intStr.toInt();
+	JsonObject intObj = csToJsonInt(intStr);
 	m_tokenStack.pop_back();
 
 	emplaceObject(intObj);

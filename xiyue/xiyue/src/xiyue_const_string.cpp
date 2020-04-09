@@ -11,78 +11,81 @@ static const wchar_t* g_emptyString = L"";
 
 ConstStringPointer::ConstStringPointer(ConstString str)
 	: m_string(str)
-	, m_offset(0)
+	, m_cursor(m_string.data())
 {
+	m_stringBase = m_cursor;
 }
 
 wchar_t ConstStringPointer::operator*()
 {
-	if (m_offset < 0 || m_offset >= m_string.length())
+	int offset = getOffset();
+	if (offset < 0 || offset >= m_string.length())
 		return 0;
 
-	return m_string[m_offset];
+	return *m_cursor;
 }
 
 ConstStringPointer ConstStringPointer::operator++(int)
 {
 	ConstStringPointer p(m_string);
-	p.m_offset = m_offset;
-	m_offset++;
+	p.m_cursor = m_cursor;
+	m_cursor++;
 
 	return p;
 }
 
 ConstStringPointer& ConstStringPointer::operator++()
 {
-	m_offset++;
+	m_cursor++;
 	return *this;
 }
 
 ConstStringPointer ConstStringPointer::operator+(int offset)
 {
 	ConstStringPointer p(m_string);
-	p.m_offset = m_offset + offset;
+	p.m_cursor = m_cursor + offset;
 	return p;
 }
 
 ConstStringPointer ConstStringPointer::operator--(int)
 {
 	ConstStringPointer p(m_string);
-	p.m_offset = m_offset;
-	m_offset--;
+	p.m_cursor = m_cursor;
+	m_cursor--;
 
 	return p;
 }
 
 ConstStringPointer& ConstStringPointer::operator--()
 {
-	m_offset--;
+	m_cursor--;
 	return *this;
 }
 
 ConstStringPointer ConstStringPointer::operator-(int offset)
 {
 	ConstStringPointer p(m_string);
-	p.m_offset = m_offset - offset;
+	p.m_cursor = m_cursor - offset;
 	return p;
 }
 
 ConstStringPointer& ConstStringPointer::operator+=(int offset)
 {
-	m_offset += offset;
+	m_cursor += offset;
 	return *this;
 }
 
 ConstStringPointer& ConstStringPointer::operator-=(int offset)
 {
-	m_offset -= offset;
+	m_cursor -= offset;
 	return *this;
 }
 
 ConstStringPointer& ConstStringPointer::operator=(const ConstStringPointer& r)
 {
 	m_string = r.m_string;
-	m_offset = r.m_offset;
+	m_cursor = r.m_cursor;
+	m_stringBase = m_string.data();
 	return *this;
 }
 

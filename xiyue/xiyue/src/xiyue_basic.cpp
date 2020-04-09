@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "xiyue_basic.h"
+#include "xiyue_encoding.h"
 
 using namespace std;
 using namespace xiyue;
