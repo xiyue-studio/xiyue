@@ -3,6 +3,10 @@
 #include "xiyue_const_string.h"
 #include "xiyue_encoding.h"
 
+#ifdef __linux__
+#include <stdarg.h>
+#endif
+
 using namespace std;
 using namespace xiyue;
 
@@ -299,12 +303,12 @@ ConstString ConstString::trim(const ConstString& trimChars /*= L""cs*/) const
 
 int ConstString::find(const ConstString& /*str*/, int /*start*/ /*= 0*/) const
 {
-	throw exception("Should be implement by KMP algorithm.");
+	throw std::exception(std::logic_error("Should be implement by KMP algorithm."));
 }
 
 int ConstString::reverseFind(const ConstString& /*str*/, int /*start*/ /*= -1*/) const
 {
-	throw exception("Should be implement by KMP algorithm.");
+	throw std::exception(std::logic_error("Should be implement by KMP algorithm."));
 }
 
 int ConstString::reverseFind(wchar_t ch, int start /*= -1*/) const
@@ -368,7 +372,6 @@ bool xiyue::operator==(const wchar_t* l, const ConstString& r)
 bool xiyue::operator<(const wchar_t* l, const ConstString& r)
 {
 	return wcsncmp(l, r.data(), r.m_length) < 0;
-
 }
 
 wstring xiyue::operator+(const wstring& l, ConstString r)
@@ -404,7 +407,12 @@ ConstString ConstString::makeByFormat(const wchar_t* format, ...)
 	if (buffer == nullptr)
 		return L""_cs;
 
+#ifdef _WIN32
 	vswprintf_s(buffer, bufferCount + 1, format, args);
+#else
+	vswprintf(buffer, bufferCount + 1, format, args);
+#endif
+
 	ConstString result = buffer;
 	free(buffer);
 	va_end(args);

@@ -46,6 +46,26 @@ void printNormal(const wchar_t* msg)
 {
 	wprintf(L"%s\n", msg);
 }
+#elif __linux__
+void printError(const wchar_t* msg)
+{
+	fwprintf(stderr, L"%s\n", msg);
+}
+
+void printWarning(const wchar_t* msg)
+{
+	fwprintf(stderr, L"%s\n", msg);
+}
+
+void printInfo(const wchar_t* msg)
+{
+	wprintf(L"%s\n", msg);
+}
+
+void printNormal(const wchar_t* msg)
+{
+	wprintf(L"%s\n", msg);
+}
 #endif
 
 const wchar_t* LogLevel_toString(LogLevel level)
@@ -74,7 +94,11 @@ void ConsoleLogConsumer::comsumeMessage(const LogContent* content)
 	wstring msg;
 	wchar_t buffer[64];
 	tm timeInfo = { 0 };
+#ifdef _WIN32
 	localtime_s(&timeInfo, &content->timestamp);
+#elif __linux__
+	localtime_r(&content->timestamp, &timeInfo);
+#endif
 
 	if (timeInfo.tm_hour < 10)
 		msg.append(L"0");

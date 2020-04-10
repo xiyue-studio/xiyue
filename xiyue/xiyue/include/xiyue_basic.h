@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #include <vector>
+#include <list>
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -23,9 +24,13 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
-#endif // _WIN32
+#elif __linux__
 
+#include <string.h>
+#define wcsncpy_s(a, b, c, d) wcsncpy(a, c, d)
+#define wcscpy_s(a, b, c) wcscpy(a, c)
 
+#endif
 #include "xiyue_const_string.h"
 
 typedef unsigned char byte;
@@ -36,12 +41,14 @@ typedef unsigned int uint32;
 
 #define XIYUE_ARRAY_COUNT(x) (sizeof(x) / sizeof(x[0]))
 
+#ifdef _WIN32
 #ifdef assert
 #undef assert
 #define assert(condition) if (!(condition)) {		\
 	printf("%s(%d): Assertion `%s` failed!\n", __FILE__, __LINE__, #condition);		\
 	__debugbreak();		\
 }
+#endif
 #endif
 
 namespace xiyue

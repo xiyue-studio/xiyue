@@ -39,3 +39,5 @@ obj
 *.ilk
 /projects/xiyue/xiyue_test/bin
 /projects/tannpopo/tannpopo_viewer/TannpopoViewer/Debug
+.vscode
+build
