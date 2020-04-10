@@ -93,13 +93,14 @@ bool File::open(ConstString fileName, FileOpenFlag flag, FileCreateMode createMo
 		return false;
 	}
 
+	m_state = FileState_openSucceeded;
+	
 	// º∆À„≥§∂»
 	size_t offset = tell();
 	seek(0, FileSeekMode_fromFileEnd);
 	m_fileLength = tell();
 	seek(offset, FileSeekMode_fromFileBegin);
 
-	m_state = FileState_openSucceeded;
 	return true;
 }
 

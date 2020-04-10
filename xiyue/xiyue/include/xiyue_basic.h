@@ -38,10 +38,14 @@ typedef unsigned int uint32;
 
 #ifdef assert
 #undef assert
+#ifdef _DEBUG
 #define assert(condition) if (!(condition)) {		\
 	printf("%s(%d): Assertion `%s` failed!\n", __FILE__, __LINE__, #condition);		\
 	__debugbreak();		\
 }
+#else
+#define assert(condition)
+#endif
 #endif
 
 namespace xiyue

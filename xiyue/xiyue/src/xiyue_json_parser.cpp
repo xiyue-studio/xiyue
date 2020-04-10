@@ -244,7 +244,7 @@ void JsonParser::callReduce(uint8_t id)
 void JsonParser::reduceKeyValue()
 {
 	const JsonToken& token = m_tokenStack.back();
-	ConstString key = m_jsonText.substr(token.offset + 1, token.length - 2);
+	ConstString key = ConstString::makeUnmanagedString(m_jsonText.data() + token.offset + 1, token.length - 2);
 	bool isEscaped = token.isEscapedString;
 	if (m_stringNeedCreate)
 		key = key.duplicate();
@@ -282,7 +282,7 @@ static json_int_t csToJsonInt(const ConstString& str)
 	// ½âÎöÊý×Ö
 	while (p < pEnd)
 	{
-		result += result * 10 + (*p - '0');
+		result = result * 10 + (*p - '0');
 		++p;
 	}
 
@@ -321,7 +321,7 @@ void JsonParser::reduceRealObject()
 void JsonParser::reduceStringObject()
 {
 	const JsonToken& token = m_tokenStack.back();
-	ConstString str = m_jsonText.substr(token.offset + 1, token.length - 2);
+	ConstString str = ConstString::makeUnmanagedString(m_jsonText.data() + token.offset + 1, token.length - 2);
 	bool isEscaped = token.isEscapedString;
 	if (m_stringNeedCreate)
 		str = str.duplicate();

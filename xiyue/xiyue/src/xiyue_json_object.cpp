@@ -358,9 +358,10 @@ void JsonObject::appendMember(const wchar_t* key, const JsonObject& val)
 
 JsonDataAllocator* JsonObject::selectAllocator(JsonDataAllocator* allocator)
 {
-	assert(allocator != nullptr);
 	JsonDataAllocator* old = m_allocator;
 	m_allocator = allocator;
+	if (m_allocator == nullptr)
+		m_allocator = &g_defaultAllocator;
 	return old;
 }
 

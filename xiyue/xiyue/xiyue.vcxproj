@@ -178,6 +178,9 @@
     <ClInclude Include="include\xiyue_int64_pair.h" />
     <ClInclude Include="include\xiyue_logger.h" />
     <ClInclude Include="include\xiyue_logger_manager.h" />
+    <ClInclude Include="include\xiyue_mem_pool.h" />
+    <ClInclude Include="include\xiyue_mem_pool_json_data_allocator.h" />
+    <ClInclude Include="include\xiyue_single_object_mem_pool.h" />
     <ClInclude Include="include\xiyue_string_file_reader.h" />
     <ClInclude Include="include\xiyue_string_file_writer.h" />
     <ClInclude Include="include\xiyue_string_format.h" />
@@ -208,6 +211,7 @@
     <ClCompile Include="src\xiyue_json_parser.cpp" />
     <ClCompile Include="src\xiyue_logger.cpp" />
     <ClCompile Include="src\xiyue_logger_manager.cpp" />
+    <ClCompile Include="src\xiyue_mem_pool_json_data_allocator.cpp" />
     <ClCompile Include="src\xiyue_string_file_reader.cpp" />
     <ClCompile Include="src\xiyue_string_file_writer.cpp" />
     <ClCompile Include="src\xiyue_string_format.cpp" />

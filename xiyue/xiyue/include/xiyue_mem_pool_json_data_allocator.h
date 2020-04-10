@@ -1,13 +1,11 @@
 #pragma once
 #include "xiyue_json_data_allocator.h"
+#include "xiyue_mem_pool.h"
 
 namespace xiyue
 {
-	class DefaultJsonDataAllocator : public JsonDataAllocator
+	class MemPoolJsonDataAllocator : public JsonDataAllocator
 	{
-	public:
-		~DefaultJsonDataAllocator() { clearMemory(); }
-
 	public:
 		virtual JsonData* allocIntData(json_int_t val) override;
 		virtual JsonData* allocRealData(double val) override;
@@ -30,8 +28,10 @@ namespace xiyue
 		virtual void clearMemory() override;
 
 	private:
-		std::allocator<JsonData> m_jsonDataAllocator;
-		std::allocator<JsonObject> m_jsonObjectAllocator;
+		SingleObjectMemPool<JsonData> m_jsonDataAllocator;
+		SingleObjectMemPool<JsonObject> m_jsonObjectAllocator;
+		MemPool<JsonObject*> m_listDataAllocator;
+		MemPool<JsonMember> m_memberAllocator;
 		std::unordered_map<JsonStringData, JsonStringData> m_keys;
 	};
 }

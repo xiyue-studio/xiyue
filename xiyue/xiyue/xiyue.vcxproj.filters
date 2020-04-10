@@ -43,6 +43,9 @@
     <Filter Include="String">
       <UniqueIdentifier>{a919ad2c-346b-426a-9537-4c66a87d5a07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{112679e6-baae-497d-baf4-a3e0a8afaca6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src/stdafx.h">
@@ -123,6 +126,15 @@
     <ClInclude Include="include\xiyue_json_dumper.h">
       <Filter>Json\Json Object</Filter>
     </ClInclude>
+    <ClInclude Include="include\xiyue_mem_pool.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_mem_pool_json_data_allocator.h">
+      <Filter>Json\Json Allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_single_object_mem_pool.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/stdafx.cpp">
@@ -187,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="src\xiyue_json_exception.cpp">
       <Filter>Json\Json Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_mem_pool_json_data_allocator.cpp">
+      <Filter>Json\Json Allocator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

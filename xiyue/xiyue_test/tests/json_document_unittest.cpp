@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "xiyue_json_document.h"
+#include "xiyue_mem_pool_json_data_allocator.h"
 
 using namespace std;
 using namespace xiyue;
@@ -43,6 +44,9 @@ TEST(JsonDocumentTest, timeTest)
 	StringFileReader reader;
 	ASSERT_TRUE(reader.readFile(L"beijing2shanghai.json"));
 
+	MemPoolJsonDataAllocator allocator;
+	JsonObject::selectAllocator(&allocator);
+
 	int sampleCount = 100;
 	auto tick = GetTickCount();
 	for (int i = 0; i < sampleCount; ++i)
@@ -53,4 +57,6 @@ TEST(JsonDocumentTest, timeTest)
 	}
 	tick = GetTickCount() - tick;
 	printf("Time cost: %u, %f per second.\n", tick, (sampleCount * 1000.0) / tick);
+
+	JsonObject::selectAllocator(nullptr);
 }
