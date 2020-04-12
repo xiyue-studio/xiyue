@@ -20,28 +20,36 @@
 #include <atomic>
 #include <thread>
 
-#ifdef _WIN32
+#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #elif __linux__
 
 #include <string.h>
+#include <stdarg.h>
+
 #define wcsncpy_s(a, b, c, d) wcsncpy(a, c, d)
 #define wcscpy_s(a, b, c) wcscpy(a, c)
+#define _vscwprintf(format, args) vswprintf(0, 0, format, args)
+#define _vsnwprintf_s(buffer, bufferCount, len2, format, args) vswprintf(buffer, bufferCount, format, args)
+
+int _waccess(const wchar_t* path_s, int mode);
+error_t _wfopen_s(FILE** fp, wchar_t const* filename_s, wchar_t const* mode_s);
 
 #endif
+
 #include "xiyue_const_string.h"
 
 typedef unsigned char byte;
 typedef unsigned int uint32;
 
 #define XIYUE_STRING(str) __XIYUE_STRING(str)
-#define __XIYUE_STRING(str) L ## str
+#define __XIYUE_STRING(str) L##str
 
 #define XIYUE_ARRAY_COUNT(x) (sizeof(x) / sizeof(x[0]))
 
-#ifdef _WIN32
+#ifdef WIN32
 #ifdef assert
 #undef assert
 #define assert(condition) if (!(condition)) {		\

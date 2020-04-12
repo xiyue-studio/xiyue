@@ -17,8 +17,11 @@ LoggerManager* LoggerManager::getInstance()
 {
 	return &m_singleInstance;
 }
-
+#ifdef WIN32
 Logger* LoggerManager::getLogger(const wchar_t* loggerName)
+#else
+Logger* LoggerManager::getLogger(const char* loggerName)
+#endif
 {
 	auto it = m_loggerMap.find(loggerName);
 	if (it == m_loggerMap.end())

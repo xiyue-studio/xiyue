@@ -20,7 +20,11 @@ namespace xiyue
 	class Logger
 	{
 	public:
+#ifdef WIN32
 		Logger(const wchar_t* loggerName, LoggerManager* manager);
+#else
+		Logger(const char* loggerName, LoggerManager* manager);
+#endif
 
 	public:
 		inline void fatal(const wchar_t* msg) { log(LogLevel_fatal, msg); }
@@ -34,7 +38,11 @@ namespace xiyue
 		void log(LogLevel level, const wchar_t* msg);
 
 	protected:
+#ifdef WIN32
 		const std::wstring m_loggerName;
+#else
+		const std::string m_loggerName;
+#endif
 		LoggerManager* m_manager;
 	};
 

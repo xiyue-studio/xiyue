@@ -169,6 +169,9 @@ namespace xiyue
 	std::wstring operator+(ConstString r, const std::wstring& l);
 	std::wstring& operator+=(std::wstring& l, ConstString r);
 
+	bool operator==(const wchar_t*, const xiyue::ConstString&);
+	bool operator<(const wchar_t* l, const ConstString& r);
+
 #define XIYUE_CONST_STRING(fmt, ...) ::xiyue::ConstString::makeByFormat(fmt, __VA_ARGS__)
 	// ±ãÓÚ GTEST Ê¹ÓÃ
 #define EXPECT_CONST_STRING_EQ(l, r) EXPECT_EQ((l), (r)) << "Left : " << (l).cstr() << "\nRight: " << (r).cstr() << "\n"

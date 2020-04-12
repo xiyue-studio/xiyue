@@ -199,7 +199,7 @@ ConstString& ConstString::operator=(const ConstString& str)
 ConstString& ConstString::operator=(const wchar_t* str)
 {
 	long strSize = (long)wcslen(str);
-	// Èç¹û×Ô¼ºÊÇµ¥ÒýÓÃ£¬²¢ÇÒÄÚ´æ¿Õ¼ä×ã¹»£¬ÔòÖ±½Ó¸²¸ÇÔ­ÓÐÄÚ´æ
+	// ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½Çµï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½Õ¼ï¿½ï¿½ã¹»ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó¸ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½Ú´ï¿½
 	if (m_data != nullptr && m_data->nRefCount == 1 && m_data->nBufferSize > strSize)
 	{
 		wcscpy_s(m_data->stringData(), strSize + 1, str);
@@ -267,7 +267,7 @@ ConstString ConstString::lTrim(const ConstString& trimChars /*= L""cs*/) const
 {
 	ConstString result = *this;
 	const ConstString& delimiter = trimChars.isEmpty() ? g_defaultDelimiter : trimChars;
-	wchar_t lastChar = 0;	// Èç¹ûÁ¬ÐøÁ½¸ö×Ö·ûÒ»Ñù£¬¿ÉÒÔÊ¡È¥Ò»´Î²éÕÒ²Ù×÷
+	wchar_t lastChar = 0;	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¡È¥Ò»ï¿½Î²ï¿½ï¿½Ò²ï¿½ï¿½ï¿½
 	wchar_t ch = result[0];
 	while (ch != 0 && (lastChar == ch || delimiter.containsChar(ch)))
 	{
@@ -336,15 +336,15 @@ ConstString::operator const wchar_t*() const
 	if (data() + length() == 0)
 		return data();
 
-	// Èç¹ûµ±Ç°×Ö·û´®²»ÊÇ \0 ½áÎ²µÄ£¬ÔòÖØÐÂ´´½¨»º³åÇø
-	// ÌØ±ðµÄ£¬Èç¹ûÒ»¸ö»º³åÇøÊÇ·Ç¹²ÏíµÄ¿ÉÐÞ¸Ä»º³åÇø£¬ÔòÖ±½ÓÐÞ¸Ä×îºóÒ»¸ö×Ö·û£¨´´½¨»º³åÇøµÄÊ±ºò¶¼»á¶àÁôÒ»¸ö×Ö·û£©
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ \0 ï¿½ï¿½Î²ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	// ï¿½Ø±ï¿½Ä£ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·Ç¹ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Þ¸Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ò¶¼»ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½
 	if (m_unmanagedStringData == nullptr && m_data->nRefCount == 1)
 	{
 		m_data->stringData()[m_start + m_length] = 0;
 		return data();
 	}
 
-	// ÆäËüÇé¿ö£¬ÐèÒªÖØ½¨»º³åÇø
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	ConstStringData* newData = (ConstStringData*)malloc(sizeof(wchar_t) * (length() + 1) + sizeof(ConstStringData));
 	newData->nRefCount = 1;
 	newData->nBufferSize = length() + 1;
@@ -478,7 +478,7 @@ ConstString ConstString::replaceEscapedChars() const
 	s.m_data->nRefCount = 1;
 	s.m_data->nBufferSize = length() + 1;
 	
-	// ±éÀú×ªÒå×Ö·û
+	// ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½Ö·ï¿½
 	const wchar_t* p;
 	wchar_t* pDst = s.m_data->stringData();
 	if (m_unmanagedStringData != nullptr)
@@ -498,7 +498,7 @@ ConstString ConstString::replaceEscapedChars() const
 			continue;
 		}
 
-		// ´¦Àí×ªÒå×Ö·û
+		// ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½Ö·ï¿½
 		p++;
 		switch (*p)
 		{

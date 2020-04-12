@@ -160,8 +160,11 @@ size_t File::readBytes(byte* buffer, size_t readCount, size_t bufferSize)
 
 	if (m_state != FileState_openSucceeded || m_openFlag == FileOpenFlag_openForWrite)
 		return 0;
-
+#ifdef WIN32
 	return fread_s(buffer, bufferSize, sizeof(char), readCount, m_fp);
+#else
+	return fread(buffer, bufferSize, sizeof(char), m_fp);
+#endif
 }
 
 size_t File::writeBytes(const byte* buffer, size_t writeCount)

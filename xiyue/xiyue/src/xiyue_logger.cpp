@@ -13,7 +13,7 @@ const wchar_t* xiyue::formatString(const wchar_t* format, ...)
 	if (format == nullptr)
 		return L"";
 
-	va_list args = NULL;
+	va_list args = nullptr;
 	va_start(args, format);
 	size_t len = _vscwprintf(format, args) + 1;
 	wchar_t* buffer = (wchar_t*)malloc(sizeof(wchar_t) * len);
