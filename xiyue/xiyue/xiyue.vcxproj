@@ -184,6 +184,7 @@
     <ClInclude Include="include\xiyue_string_file_reader.h" />
     <ClInclude Include="include\xiyue_string_file_writer.h" />
     <ClInclude Include="include\xiyue_string_format.h" />
+    <ClInclude Include="include\xiyue_variant_type.h" />
     <ClInclude Include="src/stdafx.h" />
     <ClInclude Include="src/targetver.h" />
   </ItemGroup>

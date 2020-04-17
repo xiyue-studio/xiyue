@@ -37,6 +37,9 @@
     <ClCompile Include="tests\json_dumper_unittest.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\variant_unittest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">

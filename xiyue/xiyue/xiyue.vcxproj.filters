@@ -135,6 +135,9 @@
     <ClInclude Include="include\xiyue_single_object_mem_pool.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="include\xiyue_variant_type.h">
+      <Filter>Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/stdafx.cpp">
