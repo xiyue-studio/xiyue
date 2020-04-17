@@ -32,4 +32,8 @@ TEST(VariantTest, basicTest)
 	EXPECT_THROW(v.get<int>(), std::bad_cast);
 	double val = 0.0;
 	EXPECT_THROW(val = v, std::bad_cast);
+
+	v.switchTo<wstring>(L"This is test.");
+	EXPECT_TRUE(v.is<wstring>());
+	EXPECT_EQ(v.get<wstring>(), L"This is test.");
 }

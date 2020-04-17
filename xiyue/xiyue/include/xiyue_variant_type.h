@@ -195,6 +195,20 @@ namespace xiyue
 			return *reinterpret_cast<Type*>(&m_data);
 		}
 
+		template <typename T, typename... Types>
+		inline void switchTo(Types&&... args)
+		{
+			static_assert(TypeContained<T, Args...>::value, "Wrong type to switch.");
+
+			if (is<T>())
+				return;
+
+			using Type = typename std::decay<T>::type;
+			VariantDataHelperType::destroy(m_typeIndex, &m_data);
+			new(&m_data)Type(std::forward<Types>(args)...);
+			m_typeIndex = std::type_index(typeid(T));
+		}
+
 	private:
 		DataType m_data;
 		std::type_index m_typeIndex;
