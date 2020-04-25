@@ -46,6 +46,9 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{112679e6-baae-497d-baf4-a3e0a8afaca6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Threads">
+      <UniqueIdentifier>{61ece284-6279-465f-a4ff-396bd41e940d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src/stdafx.h">
@@ -138,6 +141,9 @@
     <ClInclude Include="include\xiyue_variant_type.h">
       <Filter>Types</Filter>
     </ClInclude>
+    <ClInclude Include="include\xiyue_vic_thread_pool.h">
+      <Filter>Threads</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/stdafx.cpp">
@@ -205,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="src\xiyue_mem_pool_json_data_allocator.cpp">
       <Filter>Json\Json Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_vic_thread_pool.cpp">
+      <Filter>Threads</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

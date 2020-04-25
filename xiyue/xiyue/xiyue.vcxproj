@@ -185,6 +185,7 @@
     <ClInclude Include="include\xiyue_string_file_writer.h" />
     <ClInclude Include="include\xiyue_string_format.h" />
     <ClInclude Include="include\xiyue_variant_type.h" />
+    <ClInclude Include="include\xiyue_vic_thread_pool.h" />
     <ClInclude Include="src/stdafx.h" />
     <ClInclude Include="src/targetver.h" />
   </ItemGroup>
@@ -216,6 +217,7 @@
     <ClCompile Include="src\xiyue_string_file_reader.cpp" />
     <ClCompile Include="src\xiyue_string_file_writer.cpp" />
     <ClCompile Include="src\xiyue_string_format.cpp" />
+    <ClCompile Include="src\xiyue_vic_thread_pool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="assets\xiyue.natvis" />
