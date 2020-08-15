@@ -1,4 +1,5 @@
 #pragma once
+#include "xiyue_array.h"
 
 namespace xiyue
 {
@@ -54,6 +55,9 @@ namespace xiyue
 		static ConstString makeByRepeat(const ConstString& s, int repeatNum);
 		static ConstString makeByRepeat(const wchar_t* s, int repeatNum);
 
+		static ConstString join(const Array<ConstString>& elements, wchar_t seperator);
+		static ConstString join(const std::vector<ConstString>& elements, wchar_t seperator);
+		static ConstString join(const ConstString* elements, size_t elementCount, wchar_t seperator);
 
 	public:
 		wchar_t operator[](int index) const;
@@ -62,6 +66,8 @@ namespace xiyue
 		ConstString& operator=(const wchar_t* str);
 		bool operator==(const ConstString& str) const;
 		bool operator==(const wchar_t* str) const;
+		bool operator!=(const ConstString& str) const;
+		bool operator!=(const wchar_t* str) const;
 		friend bool operator==(const wchar_t* l, const ConstString& r);
 		bool operator<(const ConstString& str) const;
 		bool operator<(const wchar_t* str) const;
@@ -93,6 +99,7 @@ namespace xiyue
 		int find(wchar_t ch, int start = 0) const;
 		int reverseFind(const ConstString& str, int start = -1) const;
 		int reverseFind(wchar_t ch, int start = -1) const;
+		ConstString replaceAll(const ConstString& searchText, const ConstString& replacedText, int* replaceTimes = nullptr) const;
 		bool containsChar(wchar_t ch) const;
 		bool canTransformToInt() const;
 		bool canTransformToDouble() const;
@@ -102,6 +109,8 @@ namespace xiyue
 		const wchar_t* begin() const;
 		const wchar_t* end() const;
 		void splitLines(std::vector<ConstString>& linesOut) const;
+		Array<ConstString> split(const ConstString& seperators) const;
+		Array<ConstString> split(wchar_t seperator) const;
 
 	public:
 		static const int npos = -1;
@@ -172,6 +181,7 @@ namespace xiyue
 #define XIYUE_CONST_STRING(fmt, ...) ::xiyue::ConstString::makeByFormat(fmt, __VA_ARGS__)
 	// ±„”⁄ GTEST  π”√
 #define EXPECT_CONST_STRING_EQ(l, r) EXPECT_EQ((l), (r)) << "Left : " << (l).cstr() << "\nRight: " << (r).cstr() << "\n"
+#define _CS(s) ConstString::makeUnmanagedString(s)
 }
 
 /*

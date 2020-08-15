@@ -48,6 +48,18 @@ typedef unsigned int uint32;
 #endif
 #endif
 
+#ifndef force_inline
+#ifdef _DEBUG
+#define force_inline inline
+#elif (_MSC_VER >= 1200)
+#define force_inline __forceinline
+#elif defined(_WIN32)
+#define force_inline __inline
+#else
+#define force_inline inline
+#endif
+#endif
+
 namespace xiyue
 {
 	struct SmallRect

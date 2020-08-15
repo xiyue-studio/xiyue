@@ -38,6 +38,7 @@ namespace xiyue
 		wchar_t m_escapeMark;
 	};
 
+	std::wstring xiyue_escapeCharToDisplay(wchar_t ch);
 	size_t xiyue_unescapeCppStyleInplace(wchar_t* str, size_t len);
 	std::wstring xiyue_escapeCppStyleChars(const wchar_t* str, size_t len);
 	inline std::wstring xiyue_escapeCppStyleChars(const ConstString& str) {
@@ -50,4 +51,13 @@ namespace xiyue
 		起始位置的非字母字符会被忽略。
 	*/
 	ConstString xiyue_makeCamelCaseName(const ConstString& src, bool uppercaseFirstLetter);
+
+	enum SwitchCaseState
+	{
+		SwitchCaseState_firstLetterUpperCase = 0,
+		SwitchCaseState_firstLetterLowerCase = 1,
+		SwitchCaseState_allLowerCase = 2,
+		SwitchCaseState_allUpperCase = 3
+	};
+	ConstString xiyue_switchCase(const ConstString& src, SwitchCaseState state);
 }

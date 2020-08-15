@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\xiyue_array.h" />
     <ClInclude Include="include\xiyue_json_dumper.h" />
     <ClInclude Include="include\xiyue_json_errors.h" />
     <ClInclude Include="include\xiyue_json_exception.h" />
@@ -181,11 +182,25 @@
     <ClInclude Include="include\xiyue_mem_pool.h" />
     <ClInclude Include="include\xiyue_mem_pool_json_data_allocator.h" />
     <ClInclude Include="include\xiyue_single_object_mem_pool.h" />
+    <ClInclude Include="include\xiyue_string_algorithm.h" />
     <ClInclude Include="include\xiyue_string_file_reader.h" />
     <ClInclude Include="include\xiyue_string_file_writer.h" />
     <ClInclude Include="include\xiyue_string_format.h" />
     <ClInclude Include="include\xiyue_variant_type.h" />
     <ClInclude Include="include\xiyue_vic_thread_pool.h" />
+    <ClInclude Include="include\xiyue_xy_re.h" />
+    <ClInclude Include="include\xiyue_xy_re_ast.h" />
+    <ClInclude Include="include\xiyue_xy_re_instruction.h" />
+    <ClInclude Include="include\xiyue_xy_re_lexer.h" />
+    <ClInclude Include="include\xiyue_xy_re_match_builder.h" />
+    <ClInclude Include="include\xiyue_xy_re_match_length_calculator.h" />
+    <ClInclude Include="include\xiyue_xy_re_parser.h" />
+    <ClInclude Include="include\xiyue_xy_re_process.h" />
+    <ClInclude Include="include\xiyue_xy_re_program.h" />
+    <ClInclude Include="include\xiyue_xy_re_program_builder.h" />
+    <ClInclude Include="include\xiyue_xy_re_thread.h" />
+    <ClInclude Include="include\xiyue_xy_re_thread_pool.h" />
+    <ClInclude Include="include\xiyue_xy_re_vm.h" />
     <ClInclude Include="src/stdafx.h" />
     <ClInclude Include="src/targetver.h" />
   </ItemGroup>
@@ -214,10 +229,23 @@
     <ClCompile Include="src\xiyue_logger.cpp" />
     <ClCompile Include="src\xiyue_logger_manager.cpp" />
     <ClCompile Include="src\xiyue_mem_pool_json_data_allocator.cpp" />
+    <ClCompile Include="src\xiyue_string_algorithm.cpp" />
     <ClCompile Include="src\xiyue_string_file_reader.cpp" />
     <ClCompile Include="src\xiyue_string_file_writer.cpp" />
     <ClCompile Include="src\xiyue_string_format.cpp" />
     <ClCompile Include="src\xiyue_vic_thread_pool.cpp" />
+    <ClCompile Include="src\xiyue_xy_re.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_ast.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_instruction.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_lexer.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_match_builder.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_match_length_calculator.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_parser.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_process.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_program_builder.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_thread.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_thread_pool.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_vm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="assets\xiyue.natvis" />

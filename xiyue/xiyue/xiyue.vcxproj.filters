@@ -49,6 +49,12 @@
     <Filter Include="Threads">
       <UniqueIdentifier>{61ece284-6279-465f-a4ff-396bd41e940d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Regular Expression">
+      <UniqueIdentifier>{193c515f-6e51-4ad0-88dd-ba72610b25b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data Structure">
+      <UniqueIdentifier>{08d66d0a-2c58-4eb4-b929-016abdc7f178}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src/stdafx.h">
@@ -144,6 +150,51 @@
     <ClInclude Include="include\xiyue_vic_thread_pool.h">
       <Filter>Threads</Filter>
     </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_ast.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_instruction.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_lexer.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_match_builder.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_match_length_calculator.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_parser.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_process.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_program.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_program_builder.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_thread.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_thread_pool.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_vm.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_array.h">
+      <Filter>Data Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_string_algorithm.h">
+      <Filter>String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/stdafx.cpp">
@@ -214,6 +265,45 @@
     </ClCompile>
     <ClCompile Include="src\xiyue_vic_thread_pool.cpp">
       <Filter>Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_ast.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_instruction.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_lexer.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_match_builder.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_match_length_calculator.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_parser.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_process.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_program_builder.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_thread.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_vm.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_string_algorithm.cpp">
+      <Filter>String</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_thread_pool.cpp">
+      <Filter>Regular Expression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

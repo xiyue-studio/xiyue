@@ -2,6 +2,7 @@
 #include <regex>
 #include "xiyue_const_string.h"
 #include "xiyue_encoding.h"
+#include "xiyue_string_algorithm.h"
 
 using namespace std;
 using namespace xiyue;
@@ -223,14 +224,27 @@ bool ConstString::operator==(const wchar_t* str) const
 	return wcsncmp(data(), str, m_length) == 0;
 }
 
+bool ConstString::operator!=(const ConstString& str) const
+{
+	return !operator==(str);
+}
+
+bool ConstString::operator!=(const wchar_t* str) const
+{
+	return !operator==(str);
+}
+
 bool ConstString::operator<(const ConstString& str) const
 {
-	return wcsncmp(data(), str.data(), std::min(m_length, str.m_length)) < 0;
+	int ret = wcsncmp(data(), str.data(), std::min(m_length, str.m_length));
+	if (ret == 0)
+		return m_length < str.m_length;
+	return ret < 0;
 }
 
 bool ConstString::operator<(const wchar_t* str) const
 {
-	return wcsncmp(data(), str, m_length) < 0;
+	return operator<(ConstString(str));
 }
 
 ConstString ConstString::substr(int start, int size) const
@@ -297,9 +311,38 @@ ConstString ConstString::trim(const ConstString& trimChars /*= L""cs*/) const
 	return lTrim(trimChars).rTrim(trimChars);
 }
 
-int ConstString::find(const ConstString& /*str*/, int /*start*/ /*= 0*/) const
+int ConstString::find(const ConstString& str, int start /*= 0*/) const
 {
-	throw exception("Should be implement by KMP algorithm.");
+	for (int i = start; i <= length() - str.length(); ++i)
+	{
+		bool found = true;
+		for (int j = 0; j < str.length(); ++j)
+		{
+			if (str.data()[j] != data()[i])
+			{
+				found = false;
+				break;
+			}
+		}
+
+		if (found)
+			return i;
+	}
+
+	return -1;
+}
+
+int ConstString::find(wchar_t ch, int start /*= 0*/) const
+{
+	const wchar_t* p = begin() + start;
+	const wchar_t* pEnd = end();
+	while (p != pEnd)
+	{
+		if (*p == ch)
+			return (int)(p - begin());
+	}
+
+	return -1;
 }
 
 int ConstString::reverseFind(const ConstString& /*str*/, int /*start*/ /*= -1*/) const
@@ -625,4 +668,181 @@ bool ConstString::canTransformToDouble() const
 	static wregex doubleRegex(LR"([-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?)", wregex::icase);
 
 	return regex_match(begin(), end(), doubleRegex);
+}
+
+ConstString ConstString::join(const Array<ConstString>& elements, wchar_t seperator)
+{
+	return join(elements.begin(), elements.size(), seperator);
+}
+
+ConstString ConstString::join(const vector<ConstString>& elements, wchar_t seperator)
+{
+	return join(&*elements.begin(), elements.size(), seperator);
+}
+
+ConstString ConstString::join(const ConstString* elements, size_t elementCount, wchar_t seperator)
+{
+	if (elementCount == 0)
+		return g_emptyString;
+
+	size_t stringSize = 0;
+	for (size_t i = 0; i < elementCount; ++i)
+	{
+		const ConstString* s = elements + i;
+		stringSize += (size_t)s->length();
+	}
+
+	stringSize += elementCount - 1;
+
+	ConstString result = ConstString::makeByReservedSize(stringSize);
+	wchar_t* p = result._getStringData()->stringData();
+	for (size_t i = 0; i < elementCount; ++i)
+	{
+		const ConstString* str = elements + i;
+		wcsncpy_s(p, stringSize, str->begin(), str->length());
+		p += str->length();
+
+		if (i + 1 < elementCount)
+			*p++ = seperator;
+	}
+
+	result._resetLength((int)stringSize);
+	return result;
+}
+
+Array<ConstString> ConstString::split(const ConstString& seperators) const
+{
+	std::vector<ConstString> splitedParts;
+	int startIndex = 0;
+	int index = 0;
+	for (wchar_t ch : *this)
+	{
+		if (seperators.find(ch) >= 0)
+		{
+			splitedParts.push_back(substr(startIndex, index - startIndex));
+			startIndex = index + 1;
+		}
+
+		++index;
+	}
+
+	Array<ConstString> result(splitedParts.size());
+	index = 0;
+	for (auto& s : splitedParts)
+	{
+		result[index++] = s;
+	}
+
+	return result;
+}
+
+Array<ConstString> ConstString::split(wchar_t seperator) const
+{
+	std::vector<ConstString> splitedParts;
+	int startIndex = 0;
+	int index = 0;
+	for (wchar_t ch : *this)
+	{
+		if (ch == seperator)
+		{
+			splitedParts.push_back(substr(startIndex, index - startIndex));
+			startIndex = index + 1;
+		}
+
+		++index;
+	}
+
+	Array<ConstString> result(splitedParts.size());
+	index = 0;
+	for (auto& s : splitedParts)
+	{
+		result[index++] = s;
+	}
+
+	return result;
+}
+
+bool ConstString::equalsIgnoreCase(const ConstString& r) const
+{
+	if (length() != r.length())
+		return false;
+
+	for (int i = 0; i < length(); ++i)
+	{
+		if (tolower(data()[i]) != tolower(r.data()[i]))
+			return false;
+	}
+
+	return true;
+}
+
+bool ConstString::equalsIgnoreCase(const wchar_t* r) const
+{
+	int len = (int)wcslen(r);
+	if (length() != len)
+		return false;
+
+	for (int i = 0; i < len; ++i)
+	{
+		if (tolower(data()[i]) != tolower(r[i]))
+			return false;
+	}
+
+	return true;
+}
+
+void ConstString::splitLines(std::vector<ConstString>& linesOut) const
+{
+	const wchar_t* p = begin();
+	const wchar_t* pEnd = end();
+	const wchar_t* pBegin = p;
+	const wchar_t* pLineStart = p;
+
+	for ( ;p < pEnd; ++p)
+	{
+		switch (*p)
+		{
+		case '\r':
+			if (p + 1 < pEnd && *(p + 1) == '\n')
+				break;
+		case '\n':
+			linesOut.push_back(substr(pLineStart - pBegin, p + 1 - pLineStart));
+			pLineStart = p + 1;
+			break;
+		default:
+			break;
+		}
+	}
+
+	// last line
+	if (pLineStart < pEnd)
+		linesOut.push_back(substr(pLineStart - pBegin, pEnd - pLineStart));
+}
+
+ConstString ConstString::replaceAll(const ConstString& searchText, const ConstString& replacedText, int* replaceTimes /*= nullptr*/) const
+{
+	int rt = 0;
+	BoyerMooreStringMatcher m(searchText.begin(), searchText.length());
+	wstring result;
+	size_t startPos = 0;
+	const wchar_t* p;
+	const wchar_t* pPrev = begin();
+	while ((p = m.searchIn(begin(), length(), startPos)) != nullptr)
+	{
+		size_t index = p - begin();
+		result.append(pPrev, p);
+		result.append(replacedText.begin(), replacedText.end());
+		++rt;
+		pPrev = p + searchText.length();
+		startPos = index + length();
+	}
+
+	if (replaceTimes != nullptr)
+		*replaceTimes = rt;
+
+	if (rt == 0)
+		return *this;
+
+	result.append(pPrev, end());
+	return result;
 }

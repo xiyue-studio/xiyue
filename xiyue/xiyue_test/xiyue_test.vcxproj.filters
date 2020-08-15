@@ -40,6 +40,18 @@
     <ClCompile Include="tests\variant_unittest.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\xy_re_match_length_calculator_uinttest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\xy_re_parser_unittest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\xy_re_program_builder_unittest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\xy_re_unittest.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h">

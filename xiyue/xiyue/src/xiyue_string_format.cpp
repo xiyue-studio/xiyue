@@ -169,6 +169,11 @@ static void replaceEscapeChar(const wchar_t* &pSrc, const wchar_t* pEnd, wchar_t
 	*pDst++ = dstChar;
 }
 
+wstring xiyue::xiyue_escapeCharToDisplay(wchar_t ch)
+{
+	return xiyue_escapeCppStyleChars(&ch, 1);
+}
+
 size_t xiyue::xiyue_unescapeCppStyleInplace(wchar_t* str, size_t len)
 {
 	const wchar_t* pSrc = str;
@@ -248,7 +253,8 @@ wstring xiyue::xiyue_escapeCppStyleChars(const wchar_t* str, size_t len)
 			if (!isAscii(ch))
 			{
 				wchar_t buffer[16];
-				result.append(L"\\u").append(itow(buffer, ch, 16));
+				swprintf_s(buffer, L"%04x", ch);
+				result.append(L"\\u").append(buffer);
 			}
 			else
 			{
@@ -277,6 +283,9 @@ ConstString xiyue::xiyue_makeCamelCaseName(const ConstString& src, bool uppercas
 	int state = 0;
 	for (;;)
 	{
+		if (pSrc >= src.end())
+			break;
+
 		wchar_t ch = *pSrc;
 		switch (state)
 		{
@@ -321,6 +330,48 @@ ConstString xiyue::xiyue_makeCamelCaseName(const ConstString& src, bool uppercas
 	*pDst = 0;
 	result._resetLength(pDst - result._getStringData()->stringData());
 	assert(result._getStringData()->nBufferSize >= result.length());
+	return result;
+}
+
+static wchar_t _toLower(wchar_t ch) {
+	return (wchar_t)tolower(ch);
+}
+
+static wchar_t _toUpper(wchar_t ch) {
+	return (wchar_t)toupper(ch);
+}
+
+ConstString xiyue::xiyue_switchCase(const ConstString& src, SwitchCaseState state)
+{
+	ConstString result = ConstString::makeByReservedSize(src.length());
+	result._resetLength(src.length());
+	wchar_t* pDst = result._getStringData()->stringData();
+	const wchar_t* pSrc = src.begin();
+	const wchar_t* pSrcEnd = src.end();
+
+	switch (state)
+	{
+	case SwitchCaseState_allLowerCase:
+		transform(pSrc, pSrcEnd, pDst, _toLower);
+		return result;
+	case SwitchCaseState_allUpperCase:
+		transform(pSrc, pSrcEnd, pDst, _toUpper);
+		return result;
+	}
+
+	bool isInWord = false;
+	bool toUpperCase = state == SwitchCaseState_firstLetterUpperCase;
+	while (pSrc < pSrcEnd)
+	{
+		*pDst = *pSrc;
+		
+		if (isAlpha(*pDst) && !isInWord)
+			*pDst = toUpperCase ? _toUpper(*pDst) : _toLower(*pDst);
+		isInWord = isAlpha(*pDst);
+		++pSrc;
+		++pDst;
+	}
+
 	return result;
 }
 

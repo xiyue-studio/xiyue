@@ -176,6 +176,10 @@
     <ClCompile Include="tests\json_object_unittest.cpp" />
     <ClCompile Include="tests\log_system_unittest.cpp" />
     <ClCompile Include="tests\variant_unittest.cpp" />
+    <ClCompile Include="tests\xy_re_match_length_calculator_uinttest.cpp" />
+    <ClCompile Include="tests\xy_re_parser_unittest.cpp" />
+    <ClCompile Include="tests\xy_re_program_builder_unittest.cpp" />
+    <ClCompile Include="tests\xy_re_unittest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\pch.h" />
