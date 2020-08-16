@@ -521,3 +521,22 @@ TEST(XyReProgramBuilderTest, embeddedSwitchTest)
 	expectInstruction(inst, _CHAR, 0, 'c');
 	expectInstruction(inst, SUCC);
 }
+
+TEST(XyReProgramBuilderTest, normalCase1Test)
+{
+	auto program = buildProgram(_XR((a|b)*abb));
+	ASSERT_EQ(program->instructionCount, 12);
+	const XyReInstruction* inst = program->instructions();
+	expectInstruction(inst, SPLT, 0, 1, 8);
+	expectInstruction(inst, SVST, 0, 1);
+	expectInstruction(inst, SPLT, 0, 1, 3);
+	expectInstruction(inst, _CHAR, 0, 'a');
+	expectInstruction(inst, JUMP, 0, 2);
+	expectInstruction(inst, _CHAR, 0, 'b');
+	expectInstruction(inst, SVED, 0, 1);
+	expectInstruction(inst, JUMP, 0, (uint16_t)-7);
+	expectInstruction(inst, _CHAR, 0, 'a');
+	expectInstruction(inst, _CHAR, 0, 'b');
+	expectInstruction(inst, _CHAR, 0, 'b');
+	expectInstruction(inst, SUCC);
+}

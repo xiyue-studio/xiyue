@@ -7,11 +7,11 @@ using namespace xiyue;
 TEST(XyReTest, matchBasicTest)
 {
 	XyRe re = _XR((a|b)*abb);
-// 	EXPECT_TRUE(re.match(L"abb"));
-// 	EXPECT_TRUE(re.match(L"abbabb"));
-// 	EXPECT_TRUE(re.match(L"aabbaababb"));
-// 	EXPECT_FALSE(re.match(L"aabba"));
-// 	EXPECT_FALSE(re.match(L"abbab"));
+	EXPECT_TRUE(re.match(L"abb"));
+	EXPECT_TRUE(re.match(L"abbabb"));
+	EXPECT_TRUE(re.match(L"aabbaababb"));
+	EXPECT_FALSE(re.match(L"aabba"));
+	EXPECT_FALSE(re.match(L"abbab"));
 }
 
 TEST(XyReTest, sequenceTest)
@@ -147,4 +147,33 @@ TEST(XyReTest, backReferenceTest)
 	EXPECT_FALSE(re.match(L"ab"));
 	EXPECT_FALSE(re.match(L"abcd"));
 	EXPECT_FALSE(re.match(L"ababab"));
+}
+
+TEST(XyReTest, lookBehindTest)
+{
+	XyRe re = _XR((a(?=\d{1,3}).*));
+	EXPECT_TRUE(re.match(L"a01b"));
+	EXPECT_TRUE(re.match(L"a9"));
+	EXPECT_TRUE(re.match(L"a3333"));
+	EXPECT_FALSE(re.match(L"abc"));
+	EXPECT_FALSE(re.match(L"a"));
+}
+
+TEST(XyReTest, fixedLookAheadTest)
+{
+	XyRe re = _XR(.*(?<=\d\s).*);
+	EXPECT_TRUE(re.match(L"a0 a"));
+	EXPECT_TRUE(re.match(L"1 "));
+	EXPECT_TRUE(re.match(L"abc4 4 a"));
+	EXPECT_FALSE(re.match(L"abc 0"));
+}
+
+TEST(XyReTest, searchTest_1)
+{
+	XyRe re = _XR(\d+);
+	re.setGlobalSearchMode(true);
+	auto matches = re.search(L"abc123def456");
+	EXPECT_EQ(matches.size(), 2u);
+	EXPECT_CONST_STRING_EQ(matches[0].getMatchedString(), _CS(L"123"));
+	EXPECT_CONST_STRING_EQ(matches[1].getMatchedString(), _CS(L"456"));
 }

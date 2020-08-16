@@ -257,7 +257,7 @@ static force_inline void doCall(XyReProcess* process, const XyReInstruction* ins
 			_cache = {
 					subProcess->isSucceeded(),
 					process->stringPosition() + subProcess->matchedLength(),
-					process->threadPool()->splitThread(subProcess->matchedThread())
+					subProcess->isSucceeded() ? process->threadPool()->splitThread(subProcess->matchedThread()) : nullptr
 				};
 			process->lookBehindCache().insert(make_pair(make_pair(newPC, process->stringPosition()), _cache));
 			cache = &_cache;
@@ -927,7 +927,7 @@ void XyReProcess::runThreads()
 	if (m_isSucceeded || m_isFailed)
 		return;
 
-	uint32_t marchedLength = m_sp - m_strBegin;
+	uint32_t marchedLength = m_sp - m_strBegin - m_startIndex;
 	// 推进所有 working 线程
 	while (!m_workingThreads.empty())
 	{
@@ -992,8 +992,11 @@ void XyReProcess::runThreads()
 
 void XyReProcess::reset()
 {
-	delete m_threadPool;
-	m_threadPool = new XyReThreadPool(m_program);
+	if (m_isThreadPoolManaged)
+	{
+		delete m_threadPool;
+		m_threadPool = new XyReThreadPool(m_program);
+	}
 
 	m_isSucceeded = false;
 	m_isFailed = false;

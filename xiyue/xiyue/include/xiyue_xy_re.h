@@ -50,6 +50,23 @@ namespace xiyue
 		ConstString getPrefixString() const;
 		ConstString getSuffixString() const;
 
+		/**
+			替换格式语法：
+
+			$number 或 ${number} 表示捕获组引用，如果 number 是个无效组，则直接替换成数字。
+			${name} 表示对命名捕获组的引用。name 无效时，则直接替换 name 字符串。
+			$$ 替换为 $。
+			$& 替换为整个匹配项，等价于 $0。
+			$` 替换为 prefix。
+			$' 替换为 suffix。
+			$+ 替换为最后一个数字捕获组。
+			$_ 替换为整个输入串。
+			$U 开启大写转换模式，后续替换的捕获组都将尝试转换成大写字符进行替换。
+			$E 恢复默认替换模式，不对原字符串进行大小写转换。
+			$L 开启小写转换模式，后续替换的捕获组都将尝试转换成小写字符进行替换。
+
+			其它任何未识别的指令，都将原样输出（不带 $ 符号）。
+		*/
 		ConstString format(const wchar_t* formatStr) const;
 		ConstString format(const ConstString& formatStr) const;
 
@@ -104,7 +121,10 @@ namespace xiyue
 		uint32_t testSearch(const wchar_t* str, int startIndex = 0);
 		uint32_t testSearch(const wchar_t* begin, const wchar_t* end, int startIndex = 0);
 
-		uint32_t replace(const ConstString& srcStr, const ConstString& replacePattern);
+		/**
+			@sa XyReMatch::format()
+		*/
+		ConstString replace(const ConstString& srcStr, const ConstString& replacePattern);
 
 		void compile();
 
@@ -112,33 +132,33 @@ namespace xiyue
 		/*
 			设置匹配是否忽略大小写。
 		*/
-		void setIgnoreCaseMode(bool on);
+		void setIgnoreCaseMode(bool on) { m_isIgnoreCase = on; }
 		/*
 			设置匹配是否是全局匹配。
 
 			全局匹配在 search 和 replace 的时候，会搜索所有匹配的结果，
 			而并非指找第一个匹配的结果。
 		*/
-		void setGlobalSearchMode(bool on);
+		void setGlobalSearchMode(bool on) { m_isGlobalSearchMode = on; }
 		/*
 			设置 . 元字符是否也可以匹配换行符。
 		*/
-		void setDotMatchNewLine(bool on);
+		void setDotMatchNewLine(bool on) { m_isDotMatchNewLine = on; }
 		/*
 			设置 ^ 和 $ 仅匹配字符串的开头的结尾，还是匹配行的开头和结尾。
 
 			on 表示可以匹配行头和行尾。
 		*/
-		void setMultiLineMode(bool on);
+		void setMultiLineMode(bool on) { m_isMultiLineMode = on; }
 		/*
 			设置是否支持松散模式，松散模式下，可以随意添加空格，并可以对
 			正则表达式进行注释。
 		*/
-		void setLooseMode(bool on);
+		void setLooseMode(bool on) { m_isLooseMode = on; }
 
-		void setUnicodeMode(bool on);
+		void setUnicodeMode(bool on) { m_isUnicodeMode = on; }
 
-		void setNoCaptureGroupMode(bool on);
+		void setNoCaptureGroupMode(bool on) { m_isNoCaptureMode = on; }
 
 	private:
 		uint32_t* m_regData;

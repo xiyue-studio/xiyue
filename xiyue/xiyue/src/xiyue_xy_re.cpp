@@ -4,6 +4,7 @@
 #include "xiyue_xy_re_parser.h"
 #include "xiyue_xy_re_program_builder.h"
 #include "xiyue_xy_re_vm.h"
+#include "xiyue_encoding.h"
 
 using namespace std;
 using namespace xiyue;
@@ -131,10 +132,185 @@ ConstString XyReMatch::format(const wchar_t* formatStr) const
 {
 	return format(ConstString::makeUnmanagedString(formatStr));
 }
-
-ConstString XyReMatch::format(const ConstString& /*formatStr*/) const
+enum ReplaceCharMode
 {
-	throw std::logic_error("Not implemented.");
+	NORMAL_CASE,
+	UPPER_CASE,
+	LOWER_CASE
+};
+
+static force_inline void replaceByCaseMode(wstring& target, const ConstString& str, ReplaceCharMode mode)
+{
+	const wchar_t* begin = str.begin();
+	const wchar_t* end = str.end();
+
+	if (mode == NORMAL_CASE)
+	{
+		target.append(begin, end);
+	}
+	else if (mode == UPPER_CASE)
+	{
+		while (begin < end)
+		{
+			target.push_back(towupper(*begin));
+			++begin;
+		}
+	}
+	else
+	{
+		assert(mode == LOWER_CASE);
+		while (begin < end)
+		{
+			target.push_back(towlower(*begin));
+			++begin;
+		}
+	}
+}
+
+ConstString XyReMatch::format(const ConstString& formatStr) const
+{
+	if (formatStr.isEmpty())
+		return L""_cs;
+
+	const wchar_t* fsBegin = formatStr.begin();
+	const wchar_t* fsEnd = formatStr.end();
+	ReplaceCharMode caseMode = NORMAL_CASE;
+	wstring result;
+	result.reserve(formatStr.length());
+
+	for (const wchar_t* p = fsBegin; p < fsEnd; ++p)
+	{
+		if (*p != '$')
+		{
+			result.push_back(*p);
+			continue;
+		}
+
+		++p;
+		if (p == fsEnd)
+			break;
+		if (isDigit(*p))
+		{
+			size_t num = *p - '0';
+			const wchar_t* pNumStart = p;
+			++p;
+			while (p < fsEnd && isDigit(*p))
+			{
+				num = num * 10 + (*p - '0');
+				++p;
+			}
+			--p;
+			if (num > m_unnamedGroups.size())
+			{
+				// 捕获组是个无效的组号，则直接原样输出
+				result.append(pNumStart, p + 1);
+			}
+			else
+			{
+				// 替换为捕获组的内容
+				ConstString subMatch = getSubMatch(num).getMatchedString();
+				replaceByCaseMode(result, subMatch, caseMode);
+			}
+		}
+		else if (*p == '{')
+		{
+			const wchar_t* nameStart = p;
+			while (p < fsEnd && *p != '}')
+				++p;
+			if (*p != '}')
+			{
+				// 错误的命名引用，仅输出 {
+				p = nameStart;
+				result.push_back('{');
+				continue;
+			}
+			ConstString name(nameStart + 1, p - nameStart - 1);
+			// 如果是个数字，则按照数字捕获组处理
+			const wchar_t* np = name.begin();
+			bool isAllNum = !name.isEmpty();
+			size_t num = 0;
+			while (np < name.end())
+			{
+				if (!isDigit(*np))
+				{
+					isAllNum = false;
+					break;
+				}
+				num = num * 10 + (*np - '0');
+				++np;
+			}
+			if (isAllNum)
+			{
+				// 按照数字组替换
+				if (num > m_unnamedGroups.size())
+				{
+					// 捕获组是个无效的组号，则直接原样输出
+					result.append(nameStart, p + 1);
+				}
+				else
+				{
+					// 替换为捕获组的内容
+					ConstString subMatch = getSubMatch(num).getMatchedString();
+					replaceByCaseMode(result, subMatch, caseMode);
+				}
+			}
+			else
+			{
+				// 按照命名组替换
+				auto it = m_namedGroups.find(name);
+				if (it == m_namedGroups.end())
+				{
+					// 无效名称，替换为原内容
+					result.append(nameStart, p + 1);
+				}
+				else
+				{
+					// 替换为捕获组内容
+					ConstString subMatch = getSubMatch(name).getMatchedString();
+					replaceByCaseMode(result, subMatch, caseMode);
+				}
+			}
+		}
+		else
+		{
+			switch (*p)
+			{
+			case '$':
+				result.push_back('$');
+				break;
+			case '&':
+				replaceByCaseMode(result, getMatchedString(), caseMode);
+				break;
+			case '`':
+				replaceByCaseMode(result, getPrefixString(), caseMode);
+				break;
+			case '\'':
+				replaceByCaseMode(result, getSuffixString(), caseMode);
+				break;
+			case '+':
+				if (!m_unnamedGroups.empty())
+					replaceByCaseMode(result, getSubMatch(m_unnamedGroups.size() - 1).getMatchedString(), caseMode);
+				break;
+			case '_':
+				replaceByCaseMode(result, m_originalString, caseMode);
+				break;
+			case 'U':
+				caseMode = UPPER_CASE;
+				break;
+			case 'E':
+				caseMode = NORMAL_CASE;
+				break;
+			case 'L':
+				caseMode = LOWER_CASE;
+				break;
+			default:
+				result.push_back(*p);
+				break;
+			}
+		}
+	}
+
+	return ConstString(result);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -327,4 +503,22 @@ uint32_t XyRe::testSearch(const wchar_t* str, int startIndex /*= 0*/)
 uint32_t XyRe::testSearch(const wchar_t* begin, const wchar_t* end, int startIndex /*= 0*/)
 {
 	return testSearch(ConstString(begin, end - begin), startIndex);
+}
+
+ConstString XyRe::replace(const ConstString& srcStr, const ConstString& replacePattern)
+{
+	// TODO 将 replacePattern 解析成替换指令，以避免重复 format 解析
+	vector<XyReMatch> matches = search(srcStr);
+	wstring result;
+	const wchar_t* str = srcStr.begin();
+	for (XyReMatch& m : matches)
+	{
+		result.append(str, srcStr.begin() + m.getMatchedPosition());
+		ConstString mf = m.format(replacePattern);
+		result.append(mf.begin(), mf.end());
+		str = srcStr.begin() + m.getMatchedPosition() + m.getMatchedLength();
+	}
+	result.append(str, srcStr.end());
+
+	return ConstString(result);
 }

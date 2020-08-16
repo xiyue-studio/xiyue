@@ -43,6 +43,7 @@ void XyReProgramBuilder::buildRegexNode(XyReAstNode* node)
 
 	vector<BranchCodeLenStat>* branchCodeLens = (vector<BranchCodeLenStat>*)it->second;
 	int l3 = branchCodeLens->back().l3;
+	int codeStartSize = (int)m_codes.size();
 
 	int index = 0;
 	while (branch)
@@ -67,7 +68,8 @@ void XyReProgramBuilder::buildRegexNode(XyReAstNode* node)
 
 		buildNode(branch);
 
-		int jumpPos = l3 - (int)m_codes.size();
+		int jumpPos = l3 - (int)m_codes.size() + codeStartSize;
+		assert(jumpPos != 0);
 		if (bcs.jumpLen > 1)
 		{
 			generateInstruction(JUMP, 1, 0, 0);
