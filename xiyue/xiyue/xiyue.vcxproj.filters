@@ -195,6 +195,12 @@
     <ClInclude Include="include\xiyue_string_algorithm.h">
       <Filter>String</Filter>
     </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_string_buffer.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
+    <ClInclude Include="include\xiyue_xy_re_const_string_buffer.h">
+      <Filter>Regular Expression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/stdafx.cpp">
@@ -303,6 +309,9 @@
       <Filter>String</Filter>
     </ClCompile>
     <ClCompile Include="src\xiyue_xy_re_thread_pool.cpp">
+      <Filter>Regular Expression</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xiyue_xy_re_const_string_buffer.cpp">
       <Filter>Regular Expression</Filter>
     </ClCompile>
   </ItemGroup>

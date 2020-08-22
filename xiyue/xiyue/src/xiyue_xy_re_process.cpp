@@ -244,6 +244,7 @@ static force_inline void doCall(XyReProcess* process, const XyReInstruction* ins
 
 	XyReProcess::LookAroundCache* cache;
 	XyReProcess::LookAroundCache _cache;
+	uint32_t spos = process->stringPosition() - process->stringBegin();
 	if (isLookBehind)
 	{
 		// 后向界定搜索
@@ -254,6 +255,7 @@ static force_inline void doCall(XyReProcess* process, const XyReInstruction* ins
 			// 未被缓存，则启动新线程匹配
 			subProcess = process->clone();
 			subProcess->startAt(newPC, process->stringPosition());
+			process->getStringBuffer()->setSP(spos);
 			_cache = {
 					subProcess->isSucceeded(),
 					process->stringPosition() + subProcess->matchedLength(),
@@ -281,6 +283,7 @@ static force_inline void doCall(XyReProcess* process, const XyReInstruction* ins
 				delete subProcess;
 				subProcess = nullptr;
 			}
+			process->getStringBuffer()->setSP(spos);
 			if (subProcess == nullptr)
 				_cache = {
 					false,
@@ -311,7 +314,7 @@ static force_inline void doCall(XyReProcess* process, const XyReInstruction* ins
 }
 
 static force_inline void doAllm(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	if (ch == 0
 		|| !t->isMultiLineMode && isLineBreak(ch)
 		|| !t->isUnicodeMode && !isAscii(ch)
@@ -327,7 +330,7 @@ static force_inline void doAllm(XyReProcess* process, XyReThread* t) {
 static const wchar_t* g_asciiSpaceChars = L" \t\n\r\f\v";
 static const wchar_t* g_unicodeSpaceChars = g_asciiSpaceChars;
 static force_inline void doSpce(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	bool matched;
 	if (t->isUnicodeMode)
 		matched = wcschr(g_unicodeSpaceChars, ch) != nullptr;
@@ -341,7 +344,7 @@ static force_inline void doSpce(XyReProcess* process, XyReThread* t) {
 }
 
 static force_inline void doNspc(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	bool matched;
 	if (t->isUnicodeMode)
 		matched = wcschr(g_unicodeSpaceChars, ch) != nullptr;
@@ -355,7 +358,7 @@ static force_inline void doNspc(XyReProcess* process, XyReThread* t) {
 }
 
 static force_inline void doDgit(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	if (isDigit(ch))
 		t->pcIncAndPause();
 	else
@@ -363,7 +366,7 @@ static force_inline void doDgit(XyReProcess* process, XyReThread* t) {
 }
 
 static force_inline void doNdgt(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	if (isDigit(ch))
 		t->markFailed();
 	else
@@ -371,7 +374,7 @@ static force_inline void doNdgt(XyReProcess* process, XyReThread* t) {
 }
 
 static force_inline void doWord(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	if (isWordChar(ch))
 		t->pcIncAndPause();
 	else
@@ -379,7 +382,7 @@ static force_inline void doWord(XyReProcess* process, XyReThread* t) {
 }
 
 static force_inline void doNwod(XyReProcess* process, XyReThread* t) {
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	if (isWordChar(ch))
 		t->markFailed();
 	else
@@ -513,7 +516,7 @@ static force_inline void doClsm(XyReProcess* process, const XyReInstruction* ins
 	charStart = rangeStart + rangeLength * 2;
 	returnPos = charStart + charLength;
 
-	wchar_t ch = *process->stringPosition();
+	wchar_t ch = process->cch(process->stringPosition());
 	bool matched = isChInSet(ch, rangeStart, rangeLength, charStart, charLength);
 	if (t->isIgnoreCase && !matched)
 	{
@@ -559,7 +562,8 @@ static force_inline void doWbrf(XyReProcess* process, XyReThread* t) {
 		return;
 	}
 
-	if (*process->stringPosition() != ch)
+	if (process->stringPosition() >= process->stringEnd()
+		||  *process->stringPosition() != ch)
 	{
 		t->markFailed();
 		return;
@@ -675,9 +679,7 @@ XyReProcess::XyReProcess(const XyReProgram* program)
 	: m_program(program)
 	, m_succThread{ 0, nullptr }
 {
-	m_strBegin = nullptr;
-	m_strEnd = nullptr;
-	m_sp = nullptr;
+	m_stringBuffer = nullptr;
 	m_lastSearchStoppedPos = nullptr;
 
 	m_isIgnoreCase = false;
@@ -714,7 +716,7 @@ void XyReProcess::stepThread(XyReThread* t)
 		doNoop(t);
 		break;
 	case CHAR:
-		doChar(ins, t, *m_sp);
+		doChar(ins, t, cch(stringPosition()));
 		break;
 	case SPLT:
 		doSplt(ins, t, m_threadPool, m_workingThreads);
@@ -729,7 +731,7 @@ void XyReProcess::stepThread(XyReThread* t)
 		doDely(this, t, m_delayedThreads);
 		break;
 	case ABAN:
-		doAban(this, ins, t, m_abandonWinners, m_sp - m_strBegin);
+		doAban(this, ins, t, m_abandonWinners, stringPosition() - stringBegin());
 		break;
 	case CALL:
 		doCall(this, ins, t);
@@ -801,30 +803,81 @@ void XyReProcess::stepThread(XyReThread* t)
 	}
 }
 
-void XyReProcess::startAtPc(XyReProgramPC pc)
+void XyReProcess::stepThreadLastMatch(XyReThread* t)
+{
+	const XyReInstruction* ins = (const XyReInstruction*)t->pc;
+	switch (ins->directive)
+	{
+	case CHAR:
+	case ALLM:
+	case SPCE:
+	case NSPC:
+	case DGIT:
+	case NDGT:
+	case WORD:
+	case NWOD:
+	case CLSM:
+	case DFAM:
+		t->markFailed();
+		break;
+	default:
+		stepThread(t);
+		break;
+	}
+}
+
+bool XyReProcess::stepChar()
+{
+	if(m_isSucceeded || m_isFailed)
+		return false;
+
+	if (stringPosition() == stringEnd())
+	{
+		// 尝试是否可以继续加载字符
+		if (!m_stringBuffer->loadMoreCharacters()		// 无后续字符了
+			|| stringPosition() == stringEnd())			// 有后续字符但是加载为空
+		{
+			// 进行最后一步尝试
+			if (!m_workingThreads.empty())
+				runThreads(true);
+			checkMatchState();
+
+			return false;
+		}
+	}
+
+	runThreads(false);
+	return true;
+}
+
+bool XyReProcess::startAndSuspend(XyReProgramPC pc)
 {
 	reset();
 
 	// fast fail
 	m_isFailed = true;
 	m_isNoNeedTestMore = true;
-	// 开始匹配的位置越界，则失败
-	if (m_sp > m_strEnd)
-		return;
+	// 开始匹配的位置越界，则失败，注意，sp == ep 的时候，表示空串，是可以正常匹配的
+	if (stringPosition() > stringEnd())
+	{
+		if (!m_stringBuffer->loadMoreCharacters())
+			return false;
+	}
+
 	// 如果正则表达式匹配 ^，且当前位置不在开头或者行首，则失败
 	if (m_program->startHeaderMatch)
 	{
 		wchar_t fc = formerChar();
 		if (fc != 0 && (!m_isMultiLineMode || !isLineBreak(fc)))
-			return;
+			return false;
 	}
 	// 如果正则表达式最短匹配长度大于字符串剩余长度，则失败
-	if (m_program->leastMatchedLength > (uint32_t)(m_strEnd - m_sp))
-		return;
+	if (m_program->leastMatchedLength > (uint32_t)(stringEnd() - stringPosition()))
+		return false;
 	// 全匹配模式，或者单行模式 $ 结尾的表达式，最大长度小于字符串剩余长度，则失败
 	if ((m_isMatchWholeString || !m_isMultiLineMode && m_program->endTailMatch)
-		&& m_program->mostMatchedLength < (uint32_t)(m_strEnd - m_sp))
-		return;
+		&& m_program->mostMatchedLength < (uint32_t)(stringEnd() - stringPosition()))
+		return false;
 	// TODO 其它更多的 fast fail 情况
 
 	m_isFailed = false;
@@ -833,26 +886,31 @@ void XyReProcess::startAtPc(XyReProgramPC pc)
 	XyReThread* t = m_threadPool->allocThread();
 	t->pc = pc ? pc : (XyReProgramPC)m_program->instructions();
 	m_workingThreads.push_back(t);
-	const wchar_t* savedSp = m_sp;
-	// 逐字符推进
-	while (m_sp <= m_strEnd)
-	{
-		runThreads();
 
+	return true;
+}
+
+void XyReProcess::startAtPc(XyReProgramPC pc)
+{
+	if (!startAndSuspend(pc))
+		return;
+	uint32_t savedSp = stringPosition() - stringBegin();
+	// 逐字符推进
+	while (stepChar())
+	{
 		if (m_isFailed)
 		{
 			// 预测失败，则恢复 sp 位置为之前的后一个位置
-			m_sp = savedSp + 1;
+			m_stringBuffer->setSP(savedSp + 1);
 			break;
 		}
 
-		++m_sp;
+		m_stringBuffer->spInc();
 		if (m_isSucceeded)
 			break;
 	}
 
 	// 检查匹配状态
-	checkMatchState();
 	assert(m_isSucceeded || m_isFailed);
 }
 
@@ -863,13 +921,13 @@ void XyReProcess::start()
 
 void XyReProcess::start(const wchar_t* sp)
 {
-	m_sp = sp;
-	start();
+	start(sp - stringBegin());
 }
 
 void XyReProcess::start(uint32_t index)
 {
-	start(m_strBegin + index);
+	m_stringBuffer->setSP(index);
+	start();
 }
 
 void XyReProcess::checkMatchState()
@@ -919,7 +977,7 @@ void XyReProcess::checkMatchState()
 	m_isFailed = true;
 }
 
-void XyReProcess::runThreads()
+void XyReProcess::runThreads(bool isFinalTest)
 {
 	assert(m_suspendThreads.empty());
 	// 判断当前是否无法继续推进了
@@ -927,7 +985,7 @@ void XyReProcess::runThreads()
 	if (m_isSucceeded || m_isFailed)
 		return;
 
-	uint32_t marchedLength = m_sp - m_strBegin - m_startIndex;
+	uint32_t marchedLength = stringPosition() - stringBegin() - m_startIndex;
 	// 推进所有 working 线程
 	while (!m_workingThreads.empty())
 	{
@@ -935,8 +993,10 @@ void XyReProcess::runThreads()
 		m_workingThreads.pop_front();
 
 		t->markWorking();
-		while (t->isWorking())
-			stepThread(t);
+		if (isFinalTest)
+			while (t->isWorking()) stepThreadLastMatch(t);
+		else
+			while (t->isWorking()) stepThread(t);
 
 		if (t->isFailed)
 		{
@@ -1013,13 +1073,13 @@ void XyReProcess::reset()
 	m_lookBehindCaches.clear();
 	m_lookAheadCaches.clear();
 
-	m_startIndex = m_sp - m_strBegin;
+	m_startIndex = stringPosition() - stringBegin();
 }
 
 void XyReProcess::match()
 {
 	m_isMatchWholeString = true;
-	m_sp = m_strBegin;
+	m_stringBuffer->setSP(0);
 
 	start();
 
@@ -1027,7 +1087,7 @@ void XyReProcess::match()
 		return;
 
 	// 如果并没有匹配到字符串末尾，则认为匹配失败
-	if (m_succThread.matchedLength != (uint32_t)(m_strEnd - m_strBegin))
+	if (m_succThread.matchedLength != (uint32_t)(stringEnd() - stringBegin()))
 	{
 		removeThread(m_succThread.thread);
 		m_isSucceeded = false;
@@ -1035,32 +1095,23 @@ void XyReProcess::match()
 	}
 }
 
-void XyReProcess::setTargetString(const wchar_t* strBegin, const wchar_t* strEnd, bool isFragment /*= false*/)
-{
-	m_strBegin = strBegin;
-	m_strEnd = strEnd;
-	m_formerChar = 0;
-	m_latterChar = isFragment ? *strEnd : 0;
-	m_sp = m_strBegin;
-}
-
 void XyReProcess::startAt(XyReProgramPC pc, const wchar_t* sp)
 {
-	m_sp = sp;
+	m_stringBuffer->setSP(sp - stringBegin());
 	startAtPc(pc);
 }
 
 void XyReProcess::startAt(XyReProgramPC pc, const wchar_t* sp, const wchar_t* ep)
 {
-	const wchar_t* endPos = m_strEnd;
+	const wchar_t* endPos = stringEnd();
 	wchar_t latterChar = m_latterChar;
-	m_strEnd = ep;
-	m_latterChar = *ep;
+	m_latterChar = cch(ep);
+	m_stringBuffer->resetStringEnd(ep);
 
 	m_isMatchWholeString = true;
 	startAt(pc, sp);
 
-	m_strEnd = endPos;
+	m_stringBuffer->resetStringEnd(endPos);
 	m_latterChar = latterChar;
 
 	// 检查匹配长度
@@ -1079,9 +1130,7 @@ XyReProcess* XyReProcess::clone()
 {
 	XyReProcess* p = new XyReProcess(m_program);
 
-	p->m_strBegin = m_strBegin;
-	p->m_strEnd = m_strEnd;
-	p->m_sp = m_sp;
+	p->m_stringBuffer = m_stringBuffer;
 	p->m_threadPool = m_threadPool;
 	p->m_isThreadPoolManaged = false;
 

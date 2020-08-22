@@ -190,6 +190,7 @@
     <ClInclude Include="include\xiyue_vic_thread_pool.h" />
     <ClInclude Include="include\xiyue_xy_re.h" />
     <ClInclude Include="include\xiyue_xy_re_ast.h" />
+    <ClInclude Include="include\xiyue_xy_re_const_string_buffer.h" />
     <ClInclude Include="include\xiyue_xy_re_instruction.h" />
     <ClInclude Include="include\xiyue_xy_re_lexer.h" />
     <ClInclude Include="include\xiyue_xy_re_match_builder.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="include\xiyue_xy_re_process.h" />
     <ClInclude Include="include\xiyue_xy_re_program.h" />
     <ClInclude Include="include\xiyue_xy_re_program_builder.h" />
+    <ClInclude Include="include\xiyue_xy_re_string_buffer.h" />
     <ClInclude Include="include\xiyue_xy_re_thread.h" />
     <ClInclude Include="include\xiyue_xy_re_thread_pool.h" />
     <ClInclude Include="include\xiyue_xy_re_vm.h" />
@@ -236,6 +238,7 @@
     <ClCompile Include="src\xiyue_vic_thread_pool.cpp" />
     <ClCompile Include="src\xiyue_xy_re.cpp" />
     <ClCompile Include="src\xiyue_xy_re_ast.cpp" />
+    <ClCompile Include="src\xiyue_xy_re_const_string_buffer.cpp" />
     <ClCompile Include="src\xiyue_xy_re_instruction.cpp" />
     <ClCompile Include="src\xiyue_xy_re_lexer.cpp" />
     <ClCompile Include="src\xiyue_xy_re_match_builder.cpp" />

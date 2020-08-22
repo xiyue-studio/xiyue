@@ -2,6 +2,7 @@
 #include "xiyue_xy_re_vm.h"
 #include "xiyue_xy_re_process.h"
 #include "xiyue_xy_re_match_builder.h"
+#include "xiyue_xy_re_const_string_buffer.h"
 
 using namespace std;
 using namespace xiyue;
@@ -18,7 +19,8 @@ XyReVM::XyReVM(const XyReProgram* program)
 bool XyReVM::match(const ConstString& str, XyReMatch* matchesOut)
 {
 	XyReProcess process(m_program);
-	process.setTargetString(str);
+	XyReConstStringBuffer strBuf = str;
+	process.setStringBuffer(&strBuf);
 	process.setIgnoreCase(m_isIgnoreCase);
 	process.setMultiLineMode(m_isMultiLineMode);
 	process.setDotMatchNewLine(m_isDotMatchNewLine);
@@ -37,7 +39,8 @@ bool XyReVM::match(const ConstString& str, XyReMatch* matchesOut)
 bool XyReVM::searchOne(const ConstString& str, uint32_t startIndex, XyReMatch* matchesOut)
 {
 	XyReProcess process(m_program);
-	process.setTargetString(str);
+	XyReConstStringBuffer strBuf = str;
+	process.setStringBuffer(&strBuf);
 	process.setIgnoreCase(m_isIgnoreCase);
 	process.setMultiLineMode(m_isMultiLineMode);
 	process.setDotMatchNewLine(m_isDotMatchNewLine);
@@ -70,7 +73,8 @@ bool XyReVM::searchGlobal(const ConstString& str, bool globalMode, std::vector<X
 	matchesOut.clear();
 
 	XyReProcess process(m_program);
-	process.setTargetString(str);
+	XyReConstStringBuffer strBuf = str;
+	process.setStringBuffer(&strBuf);
 	process.setIgnoreCase(m_isIgnoreCase);
 	process.setMultiLineMode(m_isMultiLineMode);
 	process.setDotMatchNewLine(m_isDotMatchNewLine);
@@ -99,7 +103,8 @@ bool XyReVM::searchGlobal(const ConstString& str, bool globalMode, std::vector<X
 bool XyReVM::test(const ConstString& str, uint32_t startIndex, bool matchWhole)
 {
 	XyReProcess process(m_program);
-	process.setTargetString(str);
+	XyReConstStringBuffer strBuf = str;
+	process.setStringBuffer(&strBuf);
 	process.setIgnoreCase(m_isIgnoreCase);
 	process.setMultiLineMode(m_isMultiLineMode);
 	process.setDotMatchNewLine(m_isDotMatchNewLine);

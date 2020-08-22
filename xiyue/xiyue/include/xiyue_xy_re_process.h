@@ -1,6 +1,7 @@
 #pragma once
 #include "xiyue_xy_re_program.h"
 #include "xiyue_xy_re_thread_pool.h"
+#include "xiyue_xy_re_string_buffer.h"
 
 namespace xiyue
 {
@@ -14,17 +15,7 @@ namespace xiyue
 		virtual ~XyReProcess();
 
 	public:
-		/*
-			注意，Process 内部不会保持字符串，在 Process 有效期间，
-			需要调用者保证字符串的有效性。
-
-			isFragment = true 会自动填充前跟和后继字符，
-			否则，这两个字符都会被设置为 0。
-		*/
-		void setTargetString(const wchar_t* strBegin, const wchar_t* strEnd, bool isFragment = false);
-		void setTargetString(const ConstString& str) { setTargetString(str.begin(), str.end()); }
-		void setTargetString(const wchar_t* str) { setTargetString(str, str + wcslen(str)); }
-		void setTargetString(const std::wstring& str) { setTargetString(&*str.begin(), &*str.end()); }
+		void setStringBuffer(XyReStringBuffer* buffer) { m_stringBuffer = buffer; }
 
 		/*
 			如果给定的目标字符串只是一个片段，为了正确处理 ^, $, \b，
@@ -46,16 +37,19 @@ namespace xiyue
 		void start();
 		void start(const wchar_t* sp);
 		void start(uint32_t index);
+		// 后向界定的时候使用
 		void startAt(XyReProgramPC pc, const wchar_t* sp);
+		// 前向界定的时候使用
 		void startAt(XyReProgramPC pc, const wchar_t* sp, const wchar_t* ep);
 		void stepThread(XyReThread* t);
+		void stepThreadLastMatch(XyReThread* t);
 
 	public:
 		void reset();
 		XyReProcess* clone();
 		bool isSucceeded() { return m_isSucceeded; }
 		bool isNoNeedTestMore() { return m_isNoNeedTestMore; }
-		const wchar_t* matchedStart() { return m_strBegin + m_startIndex; }
+		const wchar_t* matchedStart() { return m_stringBuffer->stringBegin() + m_startIndex; }
 		uint32_t matchedLength() { return m_succThread.matchedLength; }
 		uint32_t startMatchIndex() { return m_startIndex; }
 		const XyReProgram* getProgram() const { return m_program; }
@@ -82,10 +76,10 @@ namespace xiyue
 		void startAtPc(XyReProgramPC pc);
 
 		void removeThread(XyReThread* t);
-		void runThreads();
-		const wchar_t* stringBegin() const { return m_strBegin; }
-		const wchar_t* stringEnd() const { return m_strEnd; }
-		const wchar_t* stringPosition() const { return m_sp; }
+		void runThreads(bool isFinalTest);
+		const wchar_t* stringBegin() const { return m_stringBuffer->stringBegin(); }
+		const wchar_t* stringEnd() const { return m_stringBuffer->stringEnd(); }
+		const wchar_t* stringPosition() const { return m_stringBuffer->stringPosition(); }
 		const wchar_t* lastSearchStoppedPosition() const { return m_lastSearchStoppedPos; }
 		wchar_t formerChar() const { return m_formerChar; }
 		wchar_t latterChar() const { return m_latterChar; }
@@ -107,13 +101,18 @@ namespace xiyue
 
 		void checkMatchState();
 
+		XyReStringBuffer* getStringBuffer() const { return m_stringBuffer; }
+
+		inline wchar_t cch(const wchar_t* sp) const { return sp >= stringEnd() ? latterChar() : *sp; }
+
+		bool startAndSuspend(XyReProgramPC pc);
+		bool stepChar();
+
 		static const int CHAR_SIZE = 2;
 
 	private:
 		const XyReProgram* m_program;
-		const wchar_t* m_strBegin;
-		const wchar_t* m_strEnd;
-		const wchar_t* m_sp;
+		XyReStringBuffer* m_stringBuffer;
 		XyReThreadPool* m_threadPool;
 
 		bool m_isIgnoreCase : 1;
