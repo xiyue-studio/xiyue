@@ -177,3 +177,19 @@ TEST(XyReTest, searchTest_1)
 	EXPECT_CONST_STRING_EQ(matches[0].getMatchedString(), _CS(L"123"));
 	EXPECT_CONST_STRING_EQ(matches[1].getMatchedString(), _CS(L"456"));
 }
+
+TEST(XyReTest, replaceTest_1)
+{
+	XyRe re = _XR(case (\w+));
+	re.setGlobalSearchMode(true);
+	ConstString result = re.replace(L"switch(x){case HELLO: break; case WORLD: break; default: break;}",
+		L"case enum_$L$1$E");
+	ConstString resultCmp = L"switch(x){case enum_hello: break; case enum_world: break; default: break;}";
+	EXPECT_CONST_STRING_EQ(result, resultCmp);
+}
+
+TEST(XyReTest, identifierTest)
+{
+	XyRe re = _XR([a-zA-Z_]\w+);
+	EXPECT_TRUE(re.match(L"container"));
+}

@@ -326,6 +326,26 @@ namespace xiyue
 			这个指令暂未实现。
 		*/
 		LAFG = 27,
+		/**
+			USER(USER custom directive)
+
+			用户自定义行为。
+			执行到这个语句的时候，Process 会产生回调。
+
+			这个指令暂未实现。
+		*/
+		USER = 28,
+		/**
+			XRPC(Xyre Remote Process Call)
+
+			线程在当前位置调用一个远端程序，从此在远端程序上匹配
+			当前字符串。
+			借用这种方式，可以产生递归匹配。
+			由于不知道远端程序的运行时地址，所以，在执行到这个指令
+			的时候，会产生一个 XrpcCallback 回调，返回值就是调用
+			地址。
+		*/
+		XRPC = 29,
 	};
 
 	struct XyReInstruction

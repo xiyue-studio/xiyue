@@ -15,9 +15,8 @@ namespace xiyue
 		inline const wchar_t* stringBegin() const { return m_strBegin; }
 		inline const wchar_t* stringEnd() const { return m_strEnd; }
 		inline const wchar_t* stringPosition() const { return m_sp; }
-		inline wchar_t formerChar() const { return m_formerChar; }
-		inline wchar_t latterChar() const { return m_latterChar; }
 
+		inline uint32_t sp() const { return m_sp - m_strBegin; }
 		inline void setSP(uint32_t offset) { m_sp = m_strBegin + offset; }
 		inline void spInc() { ++m_sp; }
 
@@ -30,7 +29,5 @@ namespace xiyue
 		const wchar_t* m_strBegin;
 		const wchar_t* m_strEnd;
 		const wchar_t* m_sp;
-		wchar_t m_formerChar;
-		wchar_t m_latterChar;
 	};
 }

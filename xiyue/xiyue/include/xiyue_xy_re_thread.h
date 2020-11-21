@@ -13,6 +13,7 @@ namespace xiyue
 	{
 		uint32_t id;
 		XyReProgramPC pc;
+		XyReThread* returnThread;
 		uint32_t backReferenceIndex;
 		uint32_t backReferenceGroupID;
 		bool isFailed;

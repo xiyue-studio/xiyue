@@ -5,6 +5,12 @@
 
 namespace xiyue
 {
+	class XyReXrpcCallback
+	{
+	public:
+		virtual XyReProgramPC xrpc(const XyReInstruction* inst) = 0;
+	};
+
 	/**
 		正则匹配的基础设施，后续，需要根据不同场景派生不同的类。
 	*/
@@ -30,6 +36,14 @@ namespace xiyue
 		void setUnicodeMode(bool on) { m_isUnicodeMode = on; }
 		void setMatchWholeString(bool on) { m_isMatchWholeString = on; }
 		void setJustTestMatch(bool on) { m_isJustTestMatch = on; }
+		/*
+			是否开启长度检测，长度检测可以快速的根据字符串长度来决定正则匹配是否
+			不可能成功。
+			对于流式输入源，不知道字符串的剩余长度，则需要关闭长度检测。
+		*/
+		void enableLengthCheck(bool on) { m_lengthCheckEnabled = on; }
+
+		void setXrpcCallback(XyReXrpcCallback* callback) { m_xrpcCallback = callback; }
 
 	public:
 		void match();
@@ -41,7 +55,7 @@ namespace xiyue
 		void startAt(XyReProgramPC pc, const wchar_t* sp);
 		// 前向界定的时候使用
 		void startAt(XyReProgramPC pc, const wchar_t* sp, const wchar_t* ep);
-		void stepThread(XyReThread* t);
+		void stepThread(XyReThread* &t);
 		void stepThreadLastMatch(XyReThread* t);
 
 	public:
@@ -106,6 +120,10 @@ namespace xiyue
 		inline wchar_t cch(const wchar_t* sp) const { return sp >= stringEnd() ? latterChar() : *sp; }
 
 		bool startAndSuspend(XyReProgramPC pc);
+
+		/**
+			以当前字符来运行进程，返回当前字符是否被当前进程接受。
+		*/
 		bool stepChar();
 
 		static const int CHAR_SIZE = 2;
@@ -125,6 +143,7 @@ namespace xiyue
 		bool m_isJustTestMatch : 1;
 		bool m_isNoNeedTestMore : 1;
 		bool m_isThreadPoolManaged : 1;
+		bool m_lengthCheckEnabled : 1;
 
 		wchar_t m_formerChar;
 		wchar_t m_latterChar;
@@ -142,5 +161,7 @@ namespace xiyue
 		// 环视缓存，在 PC 和 SP 固定的前提下，没必要重复预测环视结果
 		LookAroundCacheMap m_lookBehindCaches;
 		LookAroundCacheMap m_lookAheadCaches;
+
+		XyReXrpcCallback* m_xrpcCallback;
 	};
 }

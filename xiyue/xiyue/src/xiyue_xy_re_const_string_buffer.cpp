@@ -10,6 +10,4 @@ XyReConstStringBuffer::XyReConstStringBuffer(ConstString str)
 	m_strBegin = m_string.begin();
 	m_strEnd = m_string.end();
 	m_sp= m_strBegin;
-	m_formerChar = 0;
-	m_latterChar = 0;
 }

@@ -82,8 +82,14 @@ static force_inline void doJump(const XyReInstruction* ins, XyReThread* t) {
 	}
 }
 
-static force_inline void doSucc(XyReThread* t) {
+static force_inline void doSucc(XyReProcess* process, XyReThread* &t) {
 	t->markSucceeded();
+	if (t->returnThread != nullptr)
+	{
+		XyReThread* nt = t->returnThread;
+		process->removeThread(t);
+		t = nt;
+	}
 }
 
 static force_inline void doDely(XyReProcess* process, XyReThread* t, list<XyReThread*>& delayedThreads) {
@@ -671,6 +677,15 @@ static force_inline void doDfam(XyReProcess* process, XyReThread* t) {
 	else
 		t->pause();
 }
+
+static force_inline void doXrpc(XyReXrpcCallback* callback, XyReThread* &t, XyReThreadPool* pool) {
+	const XyReInstruction* inst = (const XyReInstruction*)t->pc;
+	t->pcInc();
+	XyReThread* nt = pool->allocThread();
+	nt->returnThread = t;
+	nt->pc = callback->xrpc(inst);
+	t = nt;
+}
 #pragma endregion
 
 //////////////////////////////////////////////////////////////////////////
@@ -694,11 +709,15 @@ XyReProcess::XyReProcess(const XyReProgram* program)
 
 	m_isThreadPoolManaged = true;
 
+	m_lengthCheckEnabled = true;
+
 	m_formerChar = 0;
 	m_latterChar = 0;
 	m_startIndex = 0;
 
 	m_threadPool = nullptr;
+
+	m_xrpcCallback = nullptr;
 }
 
 XyReProcess::~XyReProcess()
@@ -707,7 +726,7 @@ XyReProcess::~XyReProcess()
 		delete m_threadPool;
 }
 
-void XyReProcess::stepThread(XyReThread* t)
+void XyReProcess::stepThread(XyReThread* &t)
 {
 	const XyReInstruction* ins = (const XyReInstruction*)t->pc;
 	switch (ins->directive)
@@ -725,7 +744,7 @@ void XyReProcess::stepThread(XyReThread* t)
 		doJump(ins, t);
 		break;
 	case SUCC:
-		doSucc(t);
+		doSucc(this, t);
 		break;
 	case DELY:
 		doDely(this, t, m_delayedThreads);
@@ -796,6 +815,9 @@ void XyReProcess::stepThread(XyReThread* t)
 	case LAFG:
 		t->pcInc();
 		break;
+	case XRPC:
+		doXrpc(m_xrpcCallback, t, m_threadPool);
+		break;
 	default:
 		assert(!"Not supported directive.");
 		t->pcInc();
@@ -847,7 +869,8 @@ bool XyReProcess::stepChar()
 	}
 
 	runThreads(false);
-	return true;
+	checkMatchState();
+	return !m_isSucceeded && !m_isFailed;
 }
 
 bool XyReProcess::startAndSuspend(XyReProgramPC pc)
@@ -871,13 +894,16 @@ bool XyReProcess::startAndSuspend(XyReProgramPC pc)
 		if (fc != 0 && (!m_isMultiLineMode || !isLineBreak(fc)))
 			return false;
 	}
-	// 如果正则表达式最短匹配长度大于字符串剩余长度，则失败
-	if (m_program->leastMatchedLength > (uint32_t)(stringEnd() - stringPosition()))
-		return false;
-	// 全匹配模式，或者单行模式 $ 结尾的表达式，最大长度小于字符串剩余长度，则失败
-	if ((m_isMatchWholeString || !m_isMultiLineMode && m_program->endTailMatch)
-		&& m_program->mostMatchedLength < (uint32_t)(stringEnd() - stringPosition()))
-		return false;
+	if (m_lengthCheckEnabled)
+	{
+		// 如果正则表达式最短匹配长度大于字符串剩余长度，则失败
+		if (m_program->leastMatchedLength > (uint32_t)(stringEnd() - stringPosition()))
+			return false;
+		// 全匹配模式，或者单行模式 $ 结尾的表达式，最大长度小于字符串剩余长度，则失败
+		if ((m_isMatchWholeString || !m_isMultiLineMode && m_program->endTailMatch)
+			&& m_program->mostMatchedLength < (uint32_t)(stringEnd() - stringPosition()))
+			return false;
+	}
 	// TODO 其它更多的 fast fail 情况
 
 	m_isFailed = false;
@@ -912,6 +938,7 @@ void XyReProcess::startAtPc(XyReProgramPC pc)
 
 	// 检查匹配状态
 	assert(m_isSucceeded || m_isFailed);
+	m_stringBuffer->spInc();
 }
 
 void XyReProcess::start()
@@ -1155,19 +1182,24 @@ XyReProcess* XyReProcess::clone()
 
 void XyReProcess::removeThread(XyReThread* t)
 {
-	m_abandonThreads.erase(t);
-	for (auto p : m_abandonWinners)
+	while (t != nullptr)
 	{
-		if (p.second.thread == t)
+		XyReThread* nt = t->returnThread;
+		m_abandonThreads.erase(t);
+		for (auto p : m_abandonWinners)
 		{
-			m_abandonWinners.erase(p.first);
-			break;
+			if (p.second.thread == t)
+			{
+				m_abandonWinners.erase(p.first);
+				break;
+			}
 		}
-	}
-	if (m_succThread.thread == t)
-		m_succThread.thread = nullptr;
+		if (m_succThread.thread == t)
+			m_succThread.thread = nullptr;
 	
-	m_threadPool->recycleThread(t);
+		m_threadPool->recycleThread(t);
+		t = nt;
+	}
 }
 
 XyReProcess::LookAroundCache* XyReProcess::findLookBehindCache(XyReProgramPC pc, const wchar_t* sp)

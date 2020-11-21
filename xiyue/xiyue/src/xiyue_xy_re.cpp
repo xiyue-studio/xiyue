@@ -522,3 +522,12 @@ ConstString XyRe::replace(const ConstString& srcStr, const ConstString& replaceP
 
 	return ConstString(result);
 }
+
+uint32_t* XyRe::buildProgram(const wchar_t* re)
+{
+	XyReParser parser;
+	auto ast = parser.parse(re);
+	XyReProgramBuilder builder;
+	uint32_t* result = builder.build(ast.get());
+	return result;
+}

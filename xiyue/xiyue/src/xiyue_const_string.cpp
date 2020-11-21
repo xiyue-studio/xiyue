@@ -846,3 +846,11 @@ ConstString ConstString::replaceAll(const ConstString& searchText, const ConstSt
 	result.append(pPrev, end());
 	return result;
 }
+
+void ConstString::swap(ConstString& r)
+{
+	std::swap(m_data, r.m_data);
+	std::swap(m_unmanagedStringData, r.m_unmanagedStringData);
+	std::swap(m_length, r.m_length);
+	std::swap(m_start, r.m_start);
+}

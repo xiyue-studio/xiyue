@@ -85,6 +85,7 @@ namespace xiyue
 		const wchar_t* cstr() const { return (const wchar_t*)*this; }
 		bool equalsIgnoreCase(const ConstString& r) const;
 		bool equalsIgnoreCase(const wchar_t* r) const;
+		void swap(ConstString& r);
 
 	public:
 		ConstString duplicate() const;
@@ -179,6 +180,8 @@ namespace xiyue
 	std::wstring& operator+=(std::wstring& l, ConstString r);
 
 #define XIYUE_CONST_STRING(fmt, ...) ::xiyue::ConstString::makeByFormat(fmt, __VA_ARGS__)
+
+	typedef const ConstString& ConstStringRef;
 	// ±„”⁄ GTEST  π”√
 #define EXPECT_CONST_STRING_EQ(l, r) EXPECT_EQ((l), (r)) << "Left : " << (l).cstr() << "\nRight: " << (r).cstr() << "\n"
 #define _CS(s) ConstString::makeUnmanagedString(s)

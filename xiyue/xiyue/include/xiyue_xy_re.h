@@ -128,6 +128,9 @@ namespace xiyue
 
 		void compile();
 
+		// 根据 XyRe 正则表达式构建表达式指令
+		static uint32_t* buildProgram(const wchar_t* re);
+
 	public:
 		/*
 			设置匹配是否忽略大小写。
